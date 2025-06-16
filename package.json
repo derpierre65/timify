@@ -1,13 +1,12 @@
 {
-  "name": "jira-timetracker",
-  "version": "0.0.1",
-  "description": "Time Tracking UI for JIRA",
-  "productName": "Jira Timetracker",
+  "name": "simple-timetracker",
+  "version": "0.1.0",
+  "description": "A simple Timetracker",
+  "productName": "Simple Timetracker",
   "author": "derpierre65 <git@derpierre65.de>",
   "type": "module",
   "private": true,
   "scripts": {
-    "test": "echo \"No test specified\" && exit 0",
     "dev": "quasar dev",
     "build": "quasar build",
     "postinstall": "quasar prepare",
@@ -24,10 +23,12 @@
   },
   "devDependencies": {
     "@derpierre65/eslint-config": "github:derpierre65/eslint-config",
-    "@quasar/app-vite": "^2.1.0",
+    "@quasar/app-vite": "^2.2.1",
+    "@tailwindcss/postcss": "^4.1.10",
     "@types/node": "^20.5.9",
     "autoprefixer": "^10.4.2",
     "pinia-plugin-persistedstate": "^4.3.0",
+    "tailwindcss": "^4.1.10",
     "typescript": "~5.5.3"
   },
   "engines": {
