@@ -1,8 +1,6 @@
 <template>
   <q-layout view="lHh Lpr lFf">
-    <q-drawer
-      bordered
-    >
+    <q-drawer bordered>
       <q-list>
         Drawer
       </q-list>
@@ -14,5 +12,3 @@
   </q-layout>
 </template>
 
-<script setup lang="ts">
-</script>
