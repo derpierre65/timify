@@ -1,2 +1,19 @@
 {
+  "days": [
+    "Sunday",
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday"
+  ],
+  "week": {
+    "number": "Week {{number}}"
+  },
+  "actions": {
+    "start_work": "Start work",
+    "start_break": "Start break",
+    "stop_work": "Stop work"
+  }
 }
