@@ -3,6 +3,9 @@
 
 import { defineConfig } from '#q-app/wrappers';
 
+process.env.VITE_BUILD_TIMESTAMP = Date.now().toString();
+process.env.VITE_BUILD_VERSION = process.env.npm_package_version;
+
 export default defineConfig((/* ctx */) => {
   return {
     // https://v2.quasar.dev/quasar-cli-vite/prefetch-feature
@@ -11,7 +14,10 @@ export default defineConfig((/* ctx */) => {
     // app boot file (/src/boot)
     // --> boot files are part of "main.js"
     // https://v2.quasar.dev/quasar-cli-vite/boot-files
-    boot: [ 'axios', ],
+    boot: [
+      'axios',
+      'i18n',
+    ],
 
     // https://v2.quasar.dev/quasar-cli-vite/quasar-config-file#css
     css: [ 'app.scss', ],
