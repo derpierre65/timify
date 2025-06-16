@@ -6,20 +6,21 @@
         <div class="tw:text-center tw:sticky tw:top-4 q-gutter-y-md">
           <!-- timer -->
           <div>
-            <span class="tw:text-4xl tw:text-neutral-300">00</span>
+            <span class="tw:text-4xl tw:text-neutral-300">{{ currentTimer.hours }}</span>
             <span class="tw:text-4xl tw:font-light tw:text-neutral-400">:</span>
-            <span class="tw:text-4xl tw:text-neutral-300">00</span>
+            <span class="tw:text-4xl tw:text-neutral-300">{{ currentTimer.minutes }}</span>
             <span class="tw:text-4xl tw:font-light tw:text-neutral-400">:</span>
-            <span class="tw:text-4xl tw:text-neutral-300">00</span>
+            <span class="tw:text-4xl tw:text-neutral-300">{{ currentTimer.seconds }}</span>
           </div>
 
           <!-- controls -->
           <div class="tw:inline-flex tw:flex-row tw:items-center tw:justify-center tw:rounded-full tw:p-2 tw:bg-neutral-800 tw:gap-2">
             <q-btn
-              v-if="timeTrackerStore.currentStatus === TimeTrackerStatus.Stopped"
+              v-if="timeTrackerStore.currentStatus !== TimeTrackerStatus.Running"
               class="tw:rounded-full! tw:bg-green-900! tw:text-gray-200 tw!:focus:outline-none!"
               icon="fas fa-play"
               round
+              @click="triggerAction(TimeTrackerStatus.Running)"
             >
               <q-tooltip>{{ $t('actions.start_work') }}</q-tooltip>
             </q-btn>
@@ -28,6 +29,7 @@
               class="tw:rounded-full! tw:bg-blue-800! tw:text-gray-200! tw:focus:outline-none!"
               icon="fas fa-pause"
               round
+              @click="triggerAction(TimeTrackerStatus.Paused)"
             >
               <q-tooltip>{{ $t('actions.start_break') }}</q-tooltip>
             </q-btn>
@@ -38,6 +40,7 @@
               :disabled="timeTrackerStore.currentStatus === TimeTrackerStatus.Stopped"
               icon="fas fa-stop"
               round
+              @click="triggerAction(TimeTrackerStatus.Stopped)"
             >
               <q-tooltip>{{ $t('actions.stop_work') }}</q-tooltip>
             </q-btn>
@@ -65,21 +68,31 @@
 </template>
 
 <script lang="ts" setup>
-import { TimeTrackerStatus, useTimeTrackerStore } from 'stores/timeTracker';
-import { ref } from 'vue';
-import { getWeekStartEnd } from 'src/lib/date';
+import { TimeTrackerEntryType, TimeTrackerStatus, useTimeTrackerStore } from 'stores/timeTracker';
+import { computed, ref } from 'vue';
+import { getWeekStartEnd, parseSeconds } from 'src/lib/date';
 import TimeTrackerWeek from 'components/time-tracker/TimeTrackerWeek.vue';
-import {uid} from "quasar";
+import { uid, useInterval } from 'quasar';
 
 const timeTrackerStore = useTimeTrackerStore();
+const { registerInterval, } = useInterval();
 
-const weeks = ref<{
+const potentialEnd = ref(new Date());
+const weeks = ref<Array<{
   uid: string;
   start: Date;
   end: Date;
-}[]>([]);
+}>>([]);
 
-function onLoad(index, done) {
+const currentTimer = computed(() => {
+  if (!timeTrackerStore.currentEntry) {
+    return parseSeconds(0);
+  }
+
+  return parseSeconds((potentialEnd.value.getTime() - timeTrackerStore.currentEntry.start.getTime()) / 1_000);
+});
+
+function onLoad(index: number, done) {
   const lastWeek = weeks.value[weeks.value.length - 1];
   const nextWeek = new Date();
   if (lastWeek) {
@@ -92,4 +105,25 @@ function onLoad(index, done) {
   });
   done();
 }
+
+function triggerAction(status: TimeTrackerStatus) {
+  potentialEnd.value = new Date();
+
+  if (timeTrackerStore.currentEntry) {
+    timeTrackerStore.currentEntry.end = potentialEnd.value;
+  }
+
+  if (status !== TimeTrackerStatus.Stopped) {
+    timeTrackerStore.entries.push({
+      start: new Date(),
+      type: status === TimeTrackerStatus.Running ? TimeTrackerEntryType.Work : TimeTrackerEntryType.Break,
+      end: null,
+      pushedToJira: false,
+    });
+  }
+}
+
+registerInterval(() => {
+  potentialEnd.value = new Date();
+}, 997);
 </script>

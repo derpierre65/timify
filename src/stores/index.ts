@@ -1,6 +1,6 @@
 import { defineStore } from '#q-app/wrappers';
 import { createPinia } from 'pinia';
-import piniaPluginPersistedstate from 'pinia-plugin-persistedstate';
+import { createPersistedState } from 'pinia-plugin-persistedstate';
 
 /*
  * When adding new properties to stores, you should also
@@ -8,10 +8,10 @@ import piniaPluginPersistedstate from 'pinia-plugin-persistedstate';
  * @see https://pinia.vuejs.org/core-concepts/plugins.html#typing-new-store-properties
  */
 declare module 'pinia' {
-  // eslint-disable-next-line @typescript-eslint/no-empty-object-type
-  export type PiniaCustomProperties = {
+  // eslint-disable-next-line
+  export interface PiniaCustomProperties {
     // add your custom properties here, if any
-  };
+  }
 }
 
 /*
@@ -26,7 +26,9 @@ declare module 'pinia' {
 export default defineStore((/* { ssrContext } */) => {
   const pinia = createPinia();
 
-  pinia.use(piniaPluginPersistedstate);
+  pinia.use(createPersistedState({
+    key: (id) => `timetracker_${id}`,
+  }));
 
   // You can add Pinia plugins here
   // pinia.use(SomePiniaPlugin)
