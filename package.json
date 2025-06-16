@@ -10,7 +10,9 @@
     "test": "echo \"No test specified\" && exit 0",
     "dev": "quasar dev",
     "build": "quasar build",
-    "postinstall": "quasar prepare"
+    "postinstall": "quasar prepare",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
   },
   "dependencies": {
     "@quasar/extras": "^1.16.4",
@@ -21,6 +23,7 @@
     "vue-router": "^4.0.12"
   },
   "devDependencies": {
+    "@derpierre65/eslint-config": "github:derpierre65/eslint-config",
     "@quasar/app-vite": "^2.1.0",
     "@types/node": "^20.5.9",
     "autoprefixer": "^10.4.2",
