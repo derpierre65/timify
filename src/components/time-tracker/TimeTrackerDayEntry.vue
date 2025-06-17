@@ -59,11 +59,10 @@
     <q-space />
 
     <div class="flex items-center">
-      <!-- todo add merge -->
-      <q-btn icon="fas fa-arrow-up" size="sm" round disable>
+      <q-btn v-if="canMergeUpwards" icon="fas fa-arrow-up" size="sm" round @click="$emit('merge', 'up')">
         <q-tooltip>{{ $t('table.actions.merge_up') }}</q-tooltip>
       </q-btn>
-      <q-btn icon="fas fa-arrow-down" size="sm" round disable>
+      <q-btn v-if="canMergeDownwards" icon="fas fa-arrow-down" size="sm" round @click="$emit('merge', 'down')">
         <q-tooltip>{{ $t('table.actions.merge_down') }}</q-tooltip>
       </q-btn>
 
@@ -97,6 +96,12 @@ import { currentDateInjectionKey } from 'src/lib/keys';
 
 const props = defineProps<{
   entry: TimeTrackerEntry;
+  canMergeUpwards?: boolean;
+  canMergeDownwards?: boolean;
+}>();
+
+defineEmits<{
+  merge: [type: 'down' | 'up'];
 }>();
 
 const currentDate = inject<Ref<Date>>(currentDateInjectionKey)!;

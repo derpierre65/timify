@@ -22,9 +22,12 @@
       </div>
 
       <TimeTrackerDayEntry
-        v-for="entry in sortedEntries"
+        v-for="(entry, index) in sortedEntries"
         :key="entry.uid"
         :entry="entry"
+        :can-merge-upwards="index !== 0"
+        :can-merge-downwards="index < sortedEntries.length - 1"
+        @merge="mergeEntries(entry, index, $event)"
       />
     </div>
     <div
@@ -108,6 +111,34 @@ watchEffect(() => {
     breakTime: breakTime.value,
   });
 });
+
+function mergeEntries(entry, index: number, mergeType: 'down' | 'up') {
+  const deleteEntry = timeTrackerStore.entries.find((element) => element.uid === entry.uid);
+  if (!deleteEntry) {
+    return;
+  }
+
+  const refEntry = sortedEntries.value[index + (mergeType === 'down' ? 1 : -1)];
+  if (!refEntry) {
+    console.error('reference entry not found? (merge down)');
+    return;
+  }
+
+  const otherEntry = timeTrackerStore.entries.find((otherEntry) => otherEntry.uid === refEntry.uid);
+  if (!otherEntry) {
+    console.error('other entry not found? (merge down)');
+    return;
+  }
+
+  if (mergeType === 'down') {
+    otherEntry.end = deleteEntry.end;
+  }
+  else {
+    otherEntry.start = deleteEntry.start;
+  }
+
+  timeTrackerStore.entries.splice(timeTrackerStore.entries.indexOf(deleteEntry), 1);
+}
 </script>
 
 <style lang="scss" scoped>
