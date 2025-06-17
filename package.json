@@ -1,8 +1,8 @@
 {
-  "name": "simple-timetracker",
+  "name": "timify",
   "version": "0.1.0",
   "description": "A simple Timetracker",
-  "productName": "Simple Timetracker",
+  "productName": "Timify",
   "author": "derpierre65 <git@derpierre65.de>",
   "type": "module",
   "private": true,
