@@ -117,7 +117,7 @@ watchEffect(() => {
   });
 });
 
-function mergeEntries(entry, index: number, mergeType: 'down' | 'up') {
+function mergeEntries(entry: TimeTrackerEntry, index: number, mergeType: 'down' | 'up') {
   const deletingEntry = timeTrackerStore.entries.find((element) => element.uid === entry.uid);
   if (!deletingEntry) {
     return;
