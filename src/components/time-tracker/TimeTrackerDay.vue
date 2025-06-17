@@ -30,17 +30,23 @@
     <div
       class="info-box tw:border-t tw:sm:border-t-0 tw:sm:border-l"
     >
-      <span class="tw:font-semibold">00h 00m</span>
-      <span class="tw:text-xs">00h 00m</span>
+      <span class="tw:font-semibold">
+        <span>{{ workTime.hours }}h {{ workTime.minutes }}m</span>
+        <q-tooltip>{{ $t('table.work_time') }}</q-tooltip>
+      </span>
+      <span class="tw:text-xs">
+        <span>{{ breakTime.hours }}h {{ breakTime.minutes }}m</span>
+        <q-tooltip>{{ $t('table.break_time') }}</q-tooltip>
+      </span>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
-import { date } from 'quasar';
-import { getDaysBetween } from 'src/lib/date';
-import { useTimeTrackerStore } from 'stores/timeTracker';
+import { computed, ref, watchEffect } from 'vue';
+import { date, useInterval } from 'quasar';
+import { getDaysBetween, parseSeconds } from 'src/lib/date';
+import { TimeTrackerEntryType, useTimeTrackerStore } from 'stores/timeTracker';
 import TimeTrackerDayEntry from 'components/time-tracker/TimeTrackerDayEntry.vue';
 
 const props = defineProps<{
@@ -51,20 +57,52 @@ defineOptions({
   name: 'TimeTrackerDay',
 });
 
-const timetrackerStore = useTimeTrackerStore();
+const timeTrackerStore = useTimeTrackerStore();
+const updateInterval = useInterval();
+
+const currentEndDate = ref(new Date());
 
 const dateIdentifier = computed(() => {
   return date.formatDate(props.day.date, 'YYYY-MM-DD');
 });
 
 const entries = computed(() => {
-  return (timetrackerStore.groupedEntries[dateIdentifier.value] ?? []).slice();
+  return (timeTrackerStore.groupedEntries[dateIdentifier.value] ?? []).slice();
 });
+
+const workTime = computed(() => {
+  return parseSeconds(entries.value.filter((entry) => entry.type === TimeTrackerEntryType.Work).reduce((previous, entry) => {
+    return previous + ((entry.end || currentEndDate.value).getTime() - entry.start.getTime());
+  }, 0) / 1_000);
+});
+
+const breakTime = computed(() => {
+  return parseSeconds(entries.value.filter((entry) => entry.type === TimeTrackerEntryType.Break).reduce((previous, entry) => {
+    return previous + ((entry.end || currentEndDate.value).getTime() - entry.start.getTime());
+  }, 0) / 1_000);
+});
+
 const sortedEntries = computed(() => {
   return entries.value.slice().sort((a, b) => {
     return a.start > b.start ? -1 : 1;
   });
 });
+
+watchEffect(() => {
+  const hasEntryWithoutEnd = entries.value.find((entry) => !entry.end);
+  if (!hasEntryWithoutEnd) {
+    updateInterval.removeInterval();
+
+    return;
+  }
+
+  updateInterval.registerInterval(updateEndDate, 997);
+  updateEndDate();
+});
+
+function updateEndDate() {
+  currentEndDate.value = new Date();
+}
 </script>
 
 <style lang="scss" scoped>

@@ -18,7 +18,9 @@
   "table": {
     "start": "Start",
     "end": "End",
-    "end_pending": "Pending"
+    "end_pending": "Pending",
+    "work_time": "Work time",
+    "break_time": "Break time"
   },
   "actions": {
     "start_work": "Start work",
