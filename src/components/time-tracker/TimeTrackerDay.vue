@@ -31,11 +31,11 @@
       class="info-box tw:border-t tw:sm:border-t-0 tw:sm:border-l"
     >
       <span class="tw:font-semibold">
-        <span>{{ workTime.hours }}h {{ workTime.minutes }}m</span>
+        <span>{{ formattedWorkTime.hours }}h {{ formattedWorkTime.minutes }}m</span>
         <q-tooltip>{{ $t('table.work_time') }}</q-tooltip>
       </span>
       <span class="tw:text-xs">
-        <span>{{ breakTime.hours }}h {{ breakTime.minutes }}m</span>
+        <span>{{ formattedBreakTime.hours }}h {{ formattedBreakTime.minutes }}m</span>
         <q-tooltip>{{ $t('table.break_time') }}</q-tooltip>
       </span>
     </div>
@@ -51,6 +51,13 @@ import TimeTrackerDayEntry from 'components/time-tracker/TimeTrackerDayEntry.vue
 
 const props = defineProps<{
   day: ReturnType<typeof getDaysBetween>[0];
+}>();
+
+const emit = defineEmits<{
+  updateTimeInformation: [data: {
+    workTime: number;
+    breakTime: number;
+  }];
 }>();
 
 defineOptions({
@@ -71,15 +78,23 @@ const entries = computed(() => {
 });
 
 const workTime = computed(() => {
-  return parseSeconds(entries.value.filter((entry) => entry.type === TimeTrackerEntryType.Work).reduce((previous, entry) => {
+  return entries.value.filter((entry) => entry.type === TimeTrackerEntryType.Work).reduce((previous, entry) => {
     return previous + ((entry.end || currentEndDate.value).getTime() - entry.start.getTime());
-  }, 0) / 1_000);
+  }, 0) / 1_000;
+});
+
+const formattedWorkTime = computed(() => {
+  return parseSeconds(workTime.value);
 });
 
 const breakTime = computed(() => {
-  return parseSeconds(entries.value.filter((entry) => entry.type === TimeTrackerEntryType.Break).reduce((previous, entry) => {
+  return entries.value.filter((entry) => entry.type === TimeTrackerEntryType.Break).reduce((previous, entry) => {
     return previous + ((entry.end || currentEndDate.value).getTime() - entry.start.getTime());
-  }, 0) / 1_000);
+  }, 0) / 1_000;
+});
+
+const formattedBreakTime = computed(() => {
+  return parseSeconds(breakTime.value);
 });
 
 const sortedEntries = computed(() => {
@@ -98,6 +113,13 @@ watchEffect(() => {
 
   updateInterval.registerInterval(updateEndDate, 997);
   updateEndDate();
+});
+
+watchEffect(() => {
+  emit('updateTimeInformation', {
+    workTime: workTime.value,
+    breakTime: breakTime.value,
+  });
 });
 
 function updateEndDate() {
