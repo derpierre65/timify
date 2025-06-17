@@ -41,6 +41,11 @@
       </i>
     </div>
 
+    <div class="flex column tw:w-16">
+      <span class="tw:text-xs">{{ $t('table.total') }}</span>
+      <span>{{ formattedTotalTime.hours }}h {{ formattedTotalTime.minutes }}m</span>
+    </div>
+
     <div class="flex column">
       <span class="tw:text-xs">{{ $t('table.project') }}</span>
       <span>soon</span>
@@ -59,21 +64,47 @@
 
 <script setup lang="ts">
 import { TimeTrackerEntry, TimeTrackerEntryType } from 'stores/timeTracker';
-import { computed } from 'vue';
-import { date } from 'quasar';
+import { computed, ref, watchEffect } from 'vue';
+import { date, useInterval } from 'quasar';
+import { parseSeconds } from 'src/lib/date';
 
 const props = defineProps<{
   entry: TimeTrackerEntry;
 }>();
 
+const updateTime = useInterval();
+const currentEndDate = ref(new Date());
+
 const startTime = computed(() => {
   return date.formatDate(props.entry.start, 'HH:mm');
 });
+
 const endTime = computed(() => {
   if (!props.entry.end) {
     return null;
   }
 
   return date.formatDate(props.entry.end, 'HH:mm');
+});
+
+const totalTime = computed(() => {
+  const end = props.entry.end || currentEndDate.value;
+
+  return (end.getTime() - props.entry.start.getTime()) / 1_000;
+});
+
+const formattedTotalTime = computed(() => {
+  return parseSeconds(totalTime.value);
+});
+
+watchEffect(() => {
+  if (props.entry.end) {
+    updateTime.removeInterval();
+    return;
+  }
+
+  updateTime.registerInterval(() => {
+    currentEndDate.value = new Date();
+  }, 997);
 });
 </script>

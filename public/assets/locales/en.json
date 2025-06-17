@@ -17,6 +17,7 @@
   },
   "table": {
     "start": "Start",
+    "total": "Total",
     "end": "End",
     "end_pending": "Pending",
     "work_time": "Work time",
