@@ -64,16 +64,16 @@
 
 <script setup lang="ts">
 import { TimeTrackerEntry, TimeTrackerEntryType } from 'stores/timeTracker';
-import { computed, ref, watchEffect } from 'vue';
-import { date, useInterval } from 'quasar';
+import { computed, inject, Ref } from 'vue';
+import { date } from 'quasar';
 import { parseSeconds } from 'src/lib/date';
+import { currentDateInjectionKey } from 'src/lib/keys';
 
 const props = defineProps<{
   entry: TimeTrackerEntry;
 }>();
 
-const updateTime = useInterval();
-const currentEndDate = ref(new Date());
+const currentDate = inject<Ref<Date>>(currentDateInjectionKey)!;
 
 const startTime = computed(() => {
   return date.formatDate(props.entry.start, 'HH:mm');
@@ -88,23 +88,12 @@ const endTime = computed(() => {
 });
 
 const totalTime = computed(() => {
-  const end = props.entry.end || currentEndDate.value;
+  const end = props.entry.end || currentDate.value;
 
   return (end.getTime() - props.entry.start.getTime()) / 1_000;
 });
 
 const formattedTotalTime = computed(() => {
   return parseSeconds(totalTime.value);
-});
-
-watchEffect(() => {
-  if (props.entry.end) {
-    updateTime.removeInterval();
-    return;
-  }
-
-  updateTime.registerInterval(() => {
-    currentEndDate.value = new Date();
-  }, 997);
 });
 </script>

@@ -43,11 +43,12 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watchEffect } from 'vue';
-import { date, useInterval } from 'quasar';
+import { computed, inject, Ref, watchEffect } from 'vue';
+import { date } from 'quasar';
 import { getDaysBetween, parseSeconds } from 'src/lib/date';
 import { TimeTrackerEntryType, useTimeTrackerStore } from 'stores/timeTracker';
 import TimeTrackerDayEntry from 'components/time-tracker/TimeTrackerDayEntry.vue';
+import { currentDateInjectionKey } from 'src/lib/keys';
 
 const props = defineProps<{
   day: ReturnType<typeof getDaysBetween>[0];
@@ -65,9 +66,7 @@ defineOptions({
 });
 
 const timeTrackerStore = useTimeTrackerStore();
-const updateInterval = useInterval();
-
-const currentEndDate = ref(new Date());
+const currentDate = inject<Ref<Date>>(currentDateInjectionKey)!;
 
 const dateIdentifier = computed(() => {
   return date.formatDate(props.day.date, 'YYYY-MM-DD');
@@ -79,7 +78,7 @@ const entries = computed(() => {
 
 const workTime = computed(() => {
   return entries.value.filter((entry) => entry.type === TimeTrackerEntryType.Work).reduce((previous, entry) => {
-    return previous + ((entry.end || currentEndDate.value).getTime() - entry.start.getTime());
+    return previous + ((entry.end || currentDate.value).getTime() - entry.start.getTime());
   }, 0) / 1_000;
 });
 
@@ -89,7 +88,7 @@ const formattedWorkTime = computed(() => {
 
 const breakTime = computed(() => {
   return entries.value.filter((entry) => entry.type === TimeTrackerEntryType.Break).reduce((previous, entry) => {
-    return previous + ((entry.end || currentEndDate.value).getTime() - entry.start.getTime());
+    return previous + ((entry.end || currentDate.value).getTime() - entry.start.getTime());
   }, 0) / 1_000;
 });
 
@@ -104,27 +103,11 @@ const sortedEntries = computed(() => {
 });
 
 watchEffect(() => {
-  const hasEntryWithoutEnd = entries.value.find((entry) => !entry.end);
-  if (!hasEntryWithoutEnd) {
-    updateInterval.removeInterval();
-
-    return;
-  }
-
-  updateInterval.registerInterval(updateEndDate, 997);
-  updateEndDate();
-});
-
-watchEffect(() => {
   emit('updateTimeInformation', {
     workTime: workTime.value,
     breakTime: breakTime.value,
   });
 });
-
-function updateEndDate() {
-  currentEndDate.value = new Date();
-}
 </script>
 
 <style lang="scss" scoped>
