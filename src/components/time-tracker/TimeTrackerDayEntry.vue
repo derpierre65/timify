@@ -1,10 +1,10 @@
 <template>
-  <div class="flex flex-wrap items-center tw:gap-2 tw:h-11 tw:hover:bg-dark-400 q-mx-sm">
+  <div class="flex flex-wrap items-center tw:gap-6 tw:h-11 tw:hover:bg-dark-400 q-mx-sm">
     <i class="fas flex" :class="entry.type === TimeTrackerEntryType.Work ? 'fa-desktop tw:text-neutral-500' : 'fa-coffee tw:text-green-600'">
       <q-tooltip>{{ $t(`entry_type.${entry.type}`) }}</q-tooltip>
     </i>
 
-    <div class="flex column tw:w-16">
+    <div class="flex column">
       <span class="tw:text-xs">{{ $t('table.start') }}</span>
       <span>{{ startTime }}</span>
       <!--      <input-->
@@ -20,7 +20,7 @@
       <!--      >-->
     </div>
 
-    <div class="flex column tw:w-16">
+    <div class="flex column">
       <span class="tw:text-xs">{{ $t('table.end') }}</span>
       <template v-if="endTime">
         <span>{{ endTime }}</span>
@@ -39,6 +39,16 @@
       <i v-else class="fas fa-ellipsis-h">
         <q-tooltip>{{ $t('table.end_pending') }}</q-tooltip>
       </i>
+    </div>
+
+    <div class="flex column">
+      <span class="tw:text-xs">{{ $t('table.project') }}</span>
+      <span>soon</span>
+    </div>
+
+    <div class="flex column">
+      <span class="tw:text-xs">{{ $t('table.project_code') }}</span>
+      <span>soon</span>
     </div>
 
     <q-space />

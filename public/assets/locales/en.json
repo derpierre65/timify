@@ -20,7 +20,9 @@
     "end": "End",
     "end_pending": "Pending",
     "work_time": "Work time",
-    "break_time": "Break time"
+    "break_time": "Break time",
+    "project": "Client/Project",
+    "project_code": "Project code"
   },
   "actions": {
     "start_work": "Start work",
