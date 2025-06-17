@@ -23,9 +23,14 @@
     "work_time": "Work time",
     "break_time": "Break time",
     "project": "Client/Project",
-    "project_code": "Project code"
+    "project_code": "Project code",
+    "actions": {
+      "merge_up": "Merge upward",
+      "merge_down": "Merge downward "
+    }
   },
   "actions": {
+    "delete": "Delete",
     "start_work": "Start work",
     "start_break": "Start break",
     "stop_work": "Stop work"

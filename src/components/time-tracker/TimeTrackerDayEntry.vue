@@ -58,12 +58,38 @@
 
     <q-space />
 
-    <!-- TODO actions, delete, merge, change, push to jira etc. -->
+    <div class="flex items-center">
+      <!-- todo add merge -->
+      <q-btn icon="fas fa-arrow-up" size="sm" round disable>
+        <q-tooltip>{{ $t('table.actions.merge_up') }}</q-tooltip>
+      </q-btn>
+      <q-btn icon="fas fa-arrow-down" size="sm" round disable>
+        <q-tooltip>{{ $t('table.actions.merge_down') }}</q-tooltip>
+      </q-btn>
+
+      <q-btn
+        icon="fas fa-ellipsis-h"
+        size="sm"
+        round
+      >
+        <q-menu>
+          <q-list>
+            <q-item v-close-popup clickable @click="deleteEntry">
+              <q-item-section>
+                <q-item-label>{{ $t('actions.delete') }}</q-item-label>
+              </q-item-section>
+            </q-item>
+            <!-- todo add change -->
+            <!-- todo add jira push -->
+          </q-list>
+        </q-menu>
+      </q-btn>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { TimeTrackerEntry, TimeTrackerEntryType } from 'stores/timeTracker';
+import { TimeTrackerEntry, TimeTrackerEntryType, useTimeTrackerStore } from 'stores/timeTracker';
 import { computed, inject, Ref } from 'vue';
 import { date } from 'quasar';
 import { parseSeconds } from 'src/lib/date';
@@ -74,6 +100,7 @@ const props = defineProps<{
 }>();
 
 const currentDate = inject<Ref<Date>>(currentDateInjectionKey)!;
+const timeTrackerStore = useTimeTrackerStore();
 
 const startTime = computed(() => {
   return date.formatDate(props.entry.start, 'HH:mm');
@@ -96,4 +123,8 @@ const totalTime = computed(() => {
 const formattedTotalTime = computed(() => {
   return parseSeconds(totalTime.value);
 });
+
+function deleteEntry() {
+  timeTrackerStore.entries.splice(timeTrackerStore.entries.indexOf(props.entry), 1);
+}
 </script>
