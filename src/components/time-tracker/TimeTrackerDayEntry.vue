@@ -75,7 +75,7 @@
           <q-list>
             <q-item v-close-popup clickable @click="deleteEntry">
               <q-item-section>
-                <q-item-label>{{ $t('actions.delete') }}</q-item-label>
+                <q-item-label>{{ $t('global.delete') }}</q-item-label>
               </q-item-section>
             </q-item>
             <!-- todo add change -->

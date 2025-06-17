@@ -1,4 +1,9 @@
 {
+  "global": {
+    "delete": "Delete",
+    "close": "Close",
+    "confirm": "Confirm"
+  },
   "days": [
     "Sunday",
     "Monday",
@@ -29,8 +34,14 @@
       "merge_down": "Merge downward "
     }
   },
+  "merge": {
+    "title": "Merge two entries",
+    "info": "Merging these entries would add {add}",
+    "to": "will be merged with",
+    "current_difference": "Current difference",
+    "merged": "Entries have been merged."
+  },
   "actions": {
-    "delete": "Delete",
     "start_work": "Start work",
     "start_break": "Start break",
     "stop_work": "Stop work"

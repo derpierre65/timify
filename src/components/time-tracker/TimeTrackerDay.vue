@@ -47,11 +47,14 @@
 
 <script setup lang="ts">
 import { computed, inject, Ref, watchEffect } from 'vue';
-import { date } from 'quasar';
+import { date, Dialog, Notify } from 'quasar';
 import { getDaysBetween, parseSeconds } from 'src/lib/date';
-import { TimeTrackerEntryType, useTimeTrackerStore } from 'stores/timeTracker';
+import { TimeTrackerEntry, TimeTrackerEntryType, useTimeTrackerStore } from 'stores/timeTracker';
+import { useSettingsStore } from 'stores/settings';
 import TimeTrackerDayEntry from 'components/time-tracker/TimeTrackerDayEntry.vue';
 import { currentDateInjectionKey } from 'src/lib/keys';
+import TimeTrackerMergeDialog from 'components/time-tracker/TimeTrackerMergeDialog.vue';
+import { useTranslation } from 'i18next-vue';
 
 const props = defineProps<{
   day: ReturnType<typeof getDaysBetween>[0];
@@ -69,6 +72,8 @@ defineOptions({
 });
 
 const timeTrackerStore = useTimeTrackerStore();
+const settingsStore = useSettingsStore();
+const { t, } = useTranslation();
 const currentDate = inject<Ref<Date>>(currentDateInjectionKey)!;
 
 const dateIdentifier = computed(() => {
@@ -113,8 +118,8 @@ watchEffect(() => {
 });
 
 function mergeEntries(entry, index: number, mergeType: 'down' | 'up') {
-  const deleteEntry = timeTrackerStore.entries.find((element) => element.uid === entry.uid);
-  if (!deleteEntry) {
+  const deletingEntry = timeTrackerStore.entries.find((element) => element.uid === entry.uid);
+  if (!deletingEntry) {
     return;
   }
 
@@ -130,14 +135,60 @@ function mergeEntries(entry, index: number, mergeType: 'down' | 'up') {
     return;
   }
 
+  let additionalTime: number;
+  let updateKey: keyof TimeTrackerEntry;
   if (mergeType === 'down') {
-    otherEntry.end = deleteEntry.end;
+    additionalTime = (deletingEntry.start.getTime() - (otherEntry.end || new Date()).getTime()) / 1_000;
+    updateKey = 'end';
   }
   else {
-    otherEntry.start = deleteEntry.start;
+    additionalTime = (otherEntry.start.getTime() - (deletingEntry.end || new Date()).getTime()) / 1_000;
+    updateKey = 'start';
   }
 
-  timeTrackerStore.entries.splice(timeTrackerStore.entries.indexOf(deleteEntry), 1);
+  if (showMergeDialog(additionalTime, otherEntry, deletingEntry, updateKey)) {
+    return;
+  }
+
+  otherEntry[updateKey] = deletingEntry[updateKey]!;
+  deleteEntry(deletingEntry);
+}
+
+function showMergeDialog(
+  additionalTime: number,
+  to: TimeTrackerEntry,
+  from: TimeTrackerEntry,
+  updateKey: keyof TimeTrackerEntry,
+) {
+  if (!settingsStore.mergeSettings.showWarningDialog || additionalTime < settingsStore.mergeSettings.warningTime) {
+    return false;
+  }
+
+  Dialog.create({
+    component: TimeTrackerMergeDialog,
+    componentProps: {
+      additionalTime,
+      updateKey,
+      from: from,
+      to: to,
+    },
+  })
+    .onOk(({ start, end, }) => {
+      to.start = start;
+      to.end = end;
+      deleteEntry(from);
+    });
+
+  return true;
+}
+
+function deleteEntry(entry: TimeTrackerEntry) {
+  timeTrackerStore.entries.splice(timeTrackerStore.entries.indexOf(entry), 1);
+  Notify.create({
+    type: 'positive',
+    message: t('merge.merged'),
+    position: 'top',
+  });
 }
 </script>
 
