@@ -1,7 +1,9 @@
 import { defineStore } from 'pinia';
 import { computed, ref } from 'vue';
+import { date } from 'quasar';
 
 type TimeTrackerEntry = {
+  uid: string;
   start: Date;
   end: Date | null;
   type: TimeTrackerEntryType;
@@ -22,6 +24,23 @@ enum TimeTrackerStatus {
 const useTimeTrackerStore = defineStore('timeTracker', () => {
   const entries = ref<TimeTrackerEntry[]>([]);
 
+  const groupedEntries = computed(() => {
+    const start = Date.now();
+    const grouped: Record<string, TimeTrackerEntry[]> = Object.create(null);
+    for (const entry of entries.value) {
+      const entryDate = date.formatDate(entry.start, 'YYYY-MM-DD');
+      grouped[entryDate] ??= [];
+      grouped[entryDate].push(entry);
+    }
+
+    const required = Date.now() - start;
+    console.log(`groupedEntries required ${required}ms`);
+    if (required > 30) {
+      console.warn('groupedEntries slowing down');
+    }
+
+    return grouped;
+  });
   const currentEntry = computed(() => {
     const currentEntry = entries.value[entries.value.length - 1];
     if (!currentEntry || currentEntry.end) {
@@ -40,6 +59,7 @@ const useTimeTrackerStore = defineStore('timeTracker', () => {
 
   return {
     entries,
+    groupedEntries,
     currentEntry,
     currentStatus,
   };
@@ -59,6 +79,8 @@ const useTimeTrackerStore = defineStore('timeTracker', () => {
           }
         });
 
+        console.log('Loaded', deserialized.entries.length, 'entries');
+
         return deserialized;
       },
     },
@@ -69,4 +91,5 @@ export {
   useTimeTrackerStore,
   TimeTrackerStatus,
   TimeTrackerEntryType,
+  type TimeTrackerEntry,
 };

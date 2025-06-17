@@ -72,7 +72,7 @@ import { TimeTrackerEntryType, TimeTrackerStatus, useTimeTrackerStore } from 'st
 import { computed, ref } from 'vue';
 import { getWeekStartEnd, parseSeconds } from 'src/lib/date';
 import TimeTrackerWeek from 'components/time-tracker/TimeTrackerWeek.vue';
-import { uid, useInterval } from 'quasar';
+import { date, uid, useInterval } from 'quasar';
 
 const timeTrackerStore = useTimeTrackerStore();
 const { registerInterval, } = useInterval();
@@ -108,13 +108,43 @@ function onLoad(index: number, done) {
 
 function triggerAction(status: TimeTrackerStatus) {
   potentialEnd.value = new Date();
-
   if (timeTrackerStore.currentEntry) {
-    timeTrackerStore.currentEntry.end = potentialEnd.value;
+    const endOfDate = date.endOfDate(timeTrackerStore.currentEntry.start, 'day');
+    if (potentialEnd.value > endOfDate) {
+      const finalEnd = new Date();
+      const currentStart = new Date(timeTrackerStore.currentEntry.start);
+      const type = timeTrackerStore.currentEntry.type;
+
+      while (currentStart < finalEnd) {
+        const currentEnd = date.endOfDate(new Date(currentStart), 'day');
+
+        // If currentEnd would exceed the final end time, use final end time instead
+        const endTime = currentEnd > finalEnd ? finalEnd : currentEnd;
+
+        if (timeTrackerStore.currentEntry && timeTrackerStore.currentEntry.start.getTime() === currentStart.getTime()) {
+          timeTrackerStore.currentEntry.end = new Date(endTime);
+        }
+        else {
+          timeTrackerStore.entries.push({
+            uid: uid(),
+            start: new Date(currentStart),
+            end: new Date(endTime),
+            type: type,
+            pushedToJira: false,
+          });
+        }
+
+        currentStart.setTime(currentEnd.getTime() + 1);
+      }
+    }
+    else {
+      timeTrackerStore.currentEntry.end = potentialEnd.value;
+    }
   }
 
   if (status !== TimeTrackerStatus.Stopped) {
     timeTrackerStore.entries.push({
+      uid: uid(),
       start: new Date(),
       type: status === TimeTrackerStatus.Running ? TimeTrackerEntryType.Work : TimeTrackerEntryType.Break,
       end: null,

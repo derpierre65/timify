@@ -11,6 +11,15 @@
   "week": {
     "number": "Week {{number}}"
   },
+  "entry_type": {
+    "work": "Work",
+    "break": "Break"
+  },
+  "table": {
+    "start": "Start",
+    "end": "End",
+    "end_pending": "Pending"
+  },
   "actions": {
     "start_work": "Start work",
     "start_break": "Start break",
