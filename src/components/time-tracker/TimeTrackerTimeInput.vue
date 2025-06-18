@@ -36,6 +36,7 @@ function onUpdate(newValue: string) {
 
       if (seconds >= 0) {
         newValue = splitted[0] + ('0' + Math.round(seconds * 60)).slice(-2);
+        console.log('reformat newvalue to', newValue);
       }
     }
   }
@@ -55,10 +56,14 @@ function onUpdate(newValue: string) {
     }
   }
 
-  console.log('looking for:', newValue, newValue.match(/[0-9]{4}/g));
+  console.log('looking for:', newValue, newValue.match(/^([01]\d|2[0-3]):?([0-5]\d?)$/g));
   if (newValue.match(/^([01]\d|2[0-3]):?([0-5]\d?)$/g)) {
     console.log('first match');
-    newTime = newValue.substring(0, 2) + ':' + newValue.substring(2).replace(':', '');
+    newTime = newValue.substring(0, 2) + ':' + ('0' + newValue.substring(2).replace(':', '')).slice(-2);
+  }
+  else if (newValue.match(/^([01]?\d|2[0-3]):([0-5]\d?)$/g)) {
+    console.log('first (2) match');
+    newTime = newValue.substring(0, 2) + ':' + ('0' + newValue.substring(2).replace(':', '')).slice(-2);
   }
   else if (newValue === '2400' || newValue === '24:00') {
     console.log('second match');
@@ -73,18 +78,36 @@ function onUpdate(newValue: string) {
       newTime = ('0' + newValue).slice(-2) + ':00';
     }
   }
-  else if (newValue.length === 3 && !isNaN(parseInt(newValue.substring(2)))) {
-    console.log('fourth match');
-    const minutes = parseInt(newValue.substring(2));
+  // 169 (16:09), 67 (6:07), 650 (6:50)
+  else if ([
+    2,
+    3,
+  ].includes(newValue.length) && !isNaN(parseInt(newValue))) {
+    const minutes = parseInt(newValue);
+    let finalHour = date.formatDate(modelValue.value, 'HH');
     let finalMinutes = '';
-    if (minutes >= 0 && minutes <= 5) {
-      finalMinutes = minutes + '0';
+
+    console.log('fourth match', minutes);
+
+    if (newValue.length === 2) {
+      const splitted = newValue.split('');
+      finalHour = '0' + splitted[0];
+      finalMinutes = '0' + splitted[1];
     }
     else {
-      finalMinutes = '0' + minutes;
+      const firstTwoDigits = parseInt(newValue.substring(0, 2));
+      if (firstTwoDigits >= 25) {
+        const splitted = newValue.split('');
+        finalHour = '0' + splitted[0];
+        finalMinutes = newValue.substring(1, 3);
+
+        if (parseInt(finalMinutes) > 59) {
+          return;
+        }
+      }
     }
 
-    newTime = newValue.substring(0, 2) + ':' + finalMinutes;
+    newTime = finalHour + ':' + finalMinutes;
   }
 
   console.log('result', newTime);
