@@ -16,10 +16,10 @@
       </q-card-section>
       <div class="tw:flex-auto">
         <q-card-section class="q-gutter-y-md">
-          <AppAlert type="warning" text>
+          <AppAlert v-if="showWarning" type="warning" text>
             <i18next :translation="$t('merge.info')">
-              <template #add>
-                <strong class="tw:text-red-400">{{ formattedAdditionalTime.hours }}h {{ formattedAdditionalTime.minutes }}m</strong>
+              <template #change>
+                <strong class="tw:text-red-400">{{ formattedAdditionalTime }}</strong>
               </template>
             </i18next>
           </AppAlert>
@@ -56,9 +56,8 @@
               <span class="tw:text-xs">{{ $t('merge.current_difference') }}</span>
               <span
                 class="tw:flex-auto flex column justify-center"
-                :class="currentAdditionalTime.hours === '00' && currentAdditionalTime.minutes === '00' ?
-                  'tw:text-green-400' : 'tw:text-red-400'"
-              >{{ currentAdditionalTime.hours }}h {{ currentAdditionalTime.minutes }}m</span>
+                :class="showWarning ? 'tw:text-red-400' : 'tw:text-green-400'"
+              >{{ formattedAdditionalTime }}</span>
             </div>
           </TimeTrackerMergeDialogEntryBox>
 
@@ -84,7 +83,7 @@
 <script setup lang="ts">
 import { computed, provide, ref } from 'vue';
 import { useDialogPluginComponent, useInterval } from 'quasar';
-import { parseSeconds } from 'src/lib/date';
+import { formatHourAndMinutes } from 'src/lib/date';
 import TimeTrackerMergeDialogEntryBox from 'components/time-tracker/TimeTrackerMergeDialogEntryBox.vue';
 import { TimeTrackerEntry } from 'stores/timeTracker';
 import { currentDateInjectionKey } from 'src/lib/keys';
@@ -111,18 +110,21 @@ const originalStart = ref(props.updateKey === 'start' ? props.from.start : props
 const originalEnd = ref(props.updateKey === 'start' ? props.to.end : props.from.end);
 const newStart = ref(props.updateKey === 'start' ? props.from.start : props.to.start);
 const newEnd = ref(props.updateKey === 'start' ? props.to.end : props.from.end);
-
 const currentDate = ref(new Date());
 
 const currentAdditionalTime = computed(() => {
   const startValue = originalStart.value.getTime() - newStart.value.getTime();
   const endValue = (newEnd.value || currentDate.value).getTime() - (originalEnd.value || currentDate.value).getTime();
 
-  return parseSeconds(props.additionalTime + ((startValue + endValue) / 1_000));
+  return props.additionalTime + ((startValue + endValue) / 1_000);
 });
 
 const formattedAdditionalTime = computed(() => {
-  return parseSeconds(props.additionalTime);
+  return formatHourAndMinutes(currentAdditionalTime.value);
+});
+
+const showWarning = computed(() => {
+  return Math.abs(currentAdditionalTime.value) >= 60;
 });
 
 const isValidStart = computed(() => {

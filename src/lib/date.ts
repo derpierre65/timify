@@ -57,7 +57,7 @@ function getDaysBetween(start: Date, end: Date) {
 }
 
 function parseSeconds(seconds: number) {
-  seconds = Math.round(seconds);
+  seconds = Math.abs(Math.round(seconds));
 
   const hours = Math.floor(seconds / 3_600);
   seconds -= hours * 3_600;
@@ -72,8 +72,20 @@ function parseSeconds(seconds: number) {
   };
 }
 
+function formatHourAndMinutes(seconds: number) {
+  const parsed = parseSeconds(seconds);
+  const format = `${parsed.hours}h ${parsed.minutes}m`;
+
+  if (seconds < 0) {
+    return `-${format}`;
+  }
+
+  return format;
+}
+
 export {
   getWeekStartEnd,
   getDaysBetween,
+  formatHourAndMinutes,
   parseSeconds,
 };

@@ -36,7 +36,7 @@
   },
   "merge": {
     "title": "Merge two entries",
-    "info": "Merging these entries would add {add}",
+    "info": "Merging these entries would change the time by {change}",
     "to": "will be merged with",
     "current_difference": "Current difference",
     "merged": "Entries have been merged.",
