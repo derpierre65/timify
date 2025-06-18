@@ -39,6 +39,8 @@
               <TimeTrackerTimeInput
                 v-model="newStart"
                 :label="$t('table.start')"
+                :error="!isValidStart"
+                hide-bottom-space
                 dense
               />
             </template>
@@ -59,12 +61,17 @@
               >{{ currentAdditionalTime.hours }}h {{ currentAdditionalTime.minutes }}m</span>
             </div>
           </TimeTrackerMergeDialogEntryBox>
+
+          <AppAlert v-if="!isValidStart" type="error" text dense>
+            {{ $t('merge.start_must_before_end') }}
+          </AppAlert>
         </q-card-section>
       </div>
 
       <q-card-actions class="tw:bg-neutral-950" align="right">
         <q-btn
           :label="$t('global.confirm')"
+          :disable="!canBeSaved"
           color="green"
           no-caps
           @click="confirm"
@@ -108,11 +115,22 @@ const newEnd = ref(props.updateKey === 'start' ? props.to.end : props.from.end);
 const currentDate = ref(new Date());
 
 const currentAdditionalTime = computed(() => {
-  return parseSeconds(props.additionalTime + ((originalStart.value.getTime() - newStart.value.getTime()) + ((newEnd.value || currentDate.value).getTime() - (originalEnd.value || currentDate.value))) / 1_000);
+  const startValue = originalStart.value.getTime() - newStart.value.getTime();
+  const endValue = (newEnd.value || currentDate.value).getTime() - (originalEnd.value || currentDate.value).getTime();
+
+  return parseSeconds(props.additionalTime + ((startValue + endValue) / 1_000));
 });
 
 const formattedAdditionalTime = computed(() => {
   return parseSeconds(props.additionalTime);
+});
+
+const isValidStart = computed(() => {
+  return newStart.value <= (newEnd.value || currentDate.value);
+});
+
+const canBeSaved = computed(() => {
+  return isValidStart.value;
 });
 
 function confirm() {

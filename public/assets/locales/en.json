@@ -39,7 +39,8 @@
     "info": "Merging these entries would add {add}",
     "to": "will be merged with",
     "current_difference": "Current difference",
-    "merged": "Entries have been merged."
+    "merged": "Entries have been merged.",
+    "start_must_before_end": "Start must be before End."
   },
   "actions": {
     "start_work": "Start work",

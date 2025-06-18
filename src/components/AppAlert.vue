@@ -2,6 +2,7 @@
   <q-banner
     v-if="visible"
     :class="[textClass, backgroundColor, 'tw:min-h-[48px]']"
+    :dense
     rounded
   >
     <template #avatar>
@@ -47,6 +48,7 @@ const props = withDefaults(defineProps<{
   icon?: string;
   text?: boolean;
   dismissible?: boolean;
+  dense?: boolean;
 }>(), {
   contentClass: '',
   icon: '',
@@ -96,7 +98,7 @@ const leftIcon = computed(() => {
   const attributes = {
     class: [] as string[],
     name: props.icon,
-    size: attrs.dense ? 'sm' : 'md',
+    size: props.dense ? 'sm' : 'md',
   };
 
   if (!attributes.name) {
