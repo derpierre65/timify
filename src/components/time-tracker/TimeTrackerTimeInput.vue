@@ -65,7 +65,7 @@ function onUpdate(newValue: string) {
     console.log('first (2) match');
     newTime = newValue.substring(0, 2) + ':' + ('0' + newValue.substring(2).replace(':', '')).slice(-2);
   }
-  else if (newValue === '2400' || newValue === '24:00') {
+  else if (newValue === '2400' || newValue === '24:00' || newValue === '24:0') {
     console.log('second match');
     newTime = '23:59';
   }
@@ -96,7 +96,11 @@ function onUpdate(newValue: string) {
     }
     else {
       const firstTwoDigits = parseInt(newValue.substring(0, 2));
-      if (firstTwoDigits >= 25) {
+      if (firstTwoDigits === 24) {
+        finalHour = '23';
+        finalMinutes = '59';
+      }
+      else if (firstTwoDigits >= 25) {
         const splitted = newValue.split('');
         finalHour = '0' + splitted[0];
         finalMinutes = newValue.substring(1, 3);

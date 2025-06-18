@@ -11,7 +11,10 @@
     "build": "quasar build",
     "postinstall": "quasar prepare",
     "lint": "eslint .",
-    "lint:fix": "eslint . --fix"
+    "lint:fix": "eslint . --fix",
+    "test:unit": "vitest",
+    "test:unit:watch": "vitest --watch",
+    "test:unit:ci": "vitest run"
   },
   "dependencies": {
     "@quasar/extras": "^1.16.4",
@@ -24,6 +27,7 @@
   "devDependencies": {
     "@derpierre65/eslint-config": "github:derpierre65/eslint-config",
     "@quasar/app-vite": "^2.2.1",
+    "@quasar/quasar-app-extension-testing-unit-vitest": "^1.2.3",
     "@tailwindcss/postcss": "^4.1.10",
     "@types/node": "^20.5.9",
     "autoprefixer": "^10.4.2",
@@ -33,7 +37,10 @@
     "i18next-vue": "^5.3.0",
     "pinia-plugin-persistedstate": "^4.3.0",
     "tailwindcss": "^4.1.10",
-    "typescript": "~5.5.3"
+    "typescript": "~5.5.3",
+    "@vue/test-utils": "^2.4.6",
+    "vitest": "^3.1.2",
+    "@vitest/ui": "^3.1.2"
   },
   "engines": {
     "node": "^28 || ^26 || ^24 || ^22 || ^20 || ^18",
