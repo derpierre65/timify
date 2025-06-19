@@ -85,14 +85,29 @@
     <q-space />
 
     <div class="flex items-center">
-      <q-btn v-if="canMergeUpwards" icon="fas fa-arrow-up" size="sm" round @click="$emit('merge', 'up')">
+      <q-btn
+        v-if="canMergeUpwards"
+        class="time-tracker-day-merge-button"
+        icon="fas fa-arrow-up"
+        size="sm"
+        round
+        @click="$emit('merge', 'up')"
+      >
         <q-tooltip>{{ $t('table.actions.merge_up') }}</q-tooltip>
       </q-btn>
-      <q-btn v-if="canMergeDownwards" icon="fas fa-arrow-down" size="sm" round @click="$emit('merge', 'down')">
+      <q-btn
+        v-if="canMergeDownwards"
+        class="time-tracker-day-merge-button"
+        icon="fas fa-arrow-down"
+        size="sm"
+        round
+        @click="$emit('merge', 'down')"
+      >
         <q-tooltip>{{ $t('table.actions.merge_down') }}</q-tooltip>
       </q-btn>
 
       <q-btn
+        class="time-tracker-day-options-button"
         icon="fas fa-ellipsis-h"
         size="sm"
         round

@@ -1,5 +1,29 @@
 @import 'tailwindcss' prefix(tw) source('../');
 
+@import 'intro.js/introjs.css';
+
+.introjs-tooltip {
+  @apply tw:bg-neutral-800;
+}
+
+// update z-index for introjs
+.introjs-showElement {
+  z-index: 5998 !important;
+}
+.introjs-overlay {
+  z-index: 5997 !important;
+}
+
+.introjs-tooltipReferenceLayer {
+  z-index: 5999 !important;
+}
+
+.introjs-helperLayer {
+  //z-index: 9999998;
+  z-index: 5996 !important;
+  box-shadow: rgba(255, 255, 255, 0.8) 0px 0px 1px 2px, rgba(53, 53, 53, 0.5) 0px 0px 0px 5000px !important;
+}
+
 .q-menu {
   box-shadow: 0 1px 5px rgba(0, 0, 0, 0.64), 0 2px 2px rgba(0, 0, 0, 0.34), 0 3px 1px -2px rgba(0, 0, 0, 0.32);
 }

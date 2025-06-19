@@ -53,5 +53,38 @@
     "start_work": "Start work",
     "start_break": "Start break",
     "stop_work": "Stop work"
+  },
+  "tour": {
+    "confirm_exit": "Do you really want to cancel the tour? You can restart the tour at any time from the settings.",
+    "welcome_title": "Welcome \uD83D\uDC4B",
+    "welcome": "Hello, I can help you and give you a tour so you can find your way around this very complex application.",
+    "timer_title": "Timer",
+    "timer": "I know, this is a very complicated timer and not at all self-explanatory. It shows your current tracked time in hours:minutes:seconds. Complicated, right?",
+    "controls_title": "Controls",
+    "controls": "These buttons are also very complicated. Here you can start, pause, or stop tracking your work or break time.",
+    "week_title": "Week",
+    "week": "Here you find the week number and your total tracked time for this week.",
+    "part1_end_title": "Continue Tour",
+    "part1_end": "It looks like you haven't tracked any time in the current week yet. Create your first entry and we can continue with the tour.",
+    "day": {
+      "title": "Day Information",
+      "info": "Here you can find all information about a specific day.",
+      "weekday": "Here you'll see the weekday and the corresponding date. I know - not self-explanatory.",
+      "total": "Here you can see the tracked work time (above) and break time (below).",
+      "entry": {
+        "title": "Entry Information",
+        "type": "This icon indicates whether it is a work period or a break.",
+        "start": "Here you'll see the time when you started this entry.",
+        "end": "Here you'll see the time when you ended this entry. If the entry is still running, you'll see three dots.",
+        "total": "Here you find the information on how many hours and minutes were tracked here. Seconds are tracked in the background, but not displayed.",
+        "project": "Here you can specify a client/project, allowing you to group work times.",
+        "project_code": "Here you can specify a project code to further categorize your tracked time for a client/project, for example, a ticket number.",
+        "options_title": "Entry Options",
+        "options_merge": "Here you can merge two entries. Either upwards or downwards, depending on where an entry is located. This will transfer the start or end time to the other entry. The type of your tracked time will not change.",
+        "options_more": "Here you can access more options, such as turning work time into break time, break time into work time, deleting the entry, or transferring the tracked time to Jira."
+      }
+    },
+    "ready_to_go_title": "Tour ended \uD83C\uDF89",
+    "ready_to_go": "Okay, now you should be familiar with the app. Go and create something great, get rich, or just get through your nine-to-five."
   }
 }

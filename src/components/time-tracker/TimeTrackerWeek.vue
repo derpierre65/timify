@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <div class="tw:pb-4 q-gutter-x-sm">
+  <div class="time-tracker-week">
+    <div class="tw:pb-4 q-gutter-x-sm time-tracker-week-details">
       <span class="tw:text-3xl">{{ $t('week.number', {number: weekNumber}) }}</span>
       <span class="tw:text-xl">{{ formattedWorkTime.hours }}h {{ formattedWorkTime.minutes }}m</span>
     </div>

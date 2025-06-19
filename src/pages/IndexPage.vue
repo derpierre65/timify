@@ -5,7 +5,7 @@
       <div class="tw:relative tw:shadow-xl q-pt-md tw:w-full tw:md:w-64 tw:bg-gray-900">
         <div class="tw:text-center tw:sticky tw:top-4 q-gutter-y-md">
           <!-- timer -->
-          <div>
+          <div id="index-timer">
             <span class="tw:text-4xl tw:text-neutral-300">{{ currentTimer.hours }}</span>
             <span class="tw:text-4xl tw:font-light tw:text-neutral-400">:</span>
             <span class="tw:text-4xl tw:text-neutral-300">{{ currentTimer.minutes }}</span>
@@ -14,7 +14,10 @@
           </div>
 
           <!-- controls -->
-          <div class="tw:inline-flex tw:flex-row tw:items-center tw:justify-center tw:rounded-full tw:p-2 tw:bg-neutral-800 tw:gap-2">
+          <div
+            id="index-controls"
+            class="tw:inline-flex tw:flex-row tw:items-center tw:justify-center tw:rounded-full tw:p-2 tw:bg-neutral-800 tw:gap-2"
+          >
             <q-btn
               v-if="timeTrackerStore.currentStatus !== TimeTrackerStatus.Running"
               class="tw:rounded-full! tw:bg-green-900! tw:text-gray-200 tw!:focus:outline-none!"
@@ -69,13 +72,18 @@
 
 <script lang="ts" setup>
 import { TimeTrackerEntryType, TimeTrackerStatus, useTimeTrackerStore } from 'stores/timeTracker';
-import { computed, ref } from 'vue';
+import { computed, nextTick, onMounted, ref } from 'vue';
 import { getWeekStartEnd, parseSeconds } from 'src/lib/date';
 import TimeTrackerWeek from 'components/time-tracker/TimeTrackerWeek.vue';
 import { date, uid, useInterval } from 'quasar';
 import EntryResource from 'src/lib/resources/EntryResource';
+import { getEntryTourSteps, shouldShowEntryTour, startTour } from 'src/lib/tour';
+import { useTranslation } from 'i18next-vue';
+import { useSettingsStore } from 'stores/settings';
 
 const timeTrackerStore = useTimeTrackerStore();
+const settingsStore = useSettingsStore();
+const { t, } = useTranslation();
 const { registerInterval, } = useInterval();
 
 const potentialEnd = ref(new Date());
@@ -148,6 +156,44 @@ async function triggerAction(status: TimeTrackerStatus) {
     });
   }
 }
+
+onMounted(async() => {
+  if (settingsStore.finishedTours.includes('base')) {
+    return;
+  }
+
+  await nextTick();
+  await startTour([ 'base', ].concat(shouldShowEntryTour() ? [ 'entry', ] : []), {
+    steps: [
+      {
+        title: t('tour.welcome_title'),
+        intro: t('tour.welcome'),
+        position: 'floating',
+      },
+      {
+        title: t('tour.timer_title'),
+        intro: t('tour.timer'),
+        element: document.querySelector('#index-timer'),
+      },
+      {
+        title: t('tour.controls_title'),
+        intro: t('tour.controls'),
+        element: document.querySelector('#index-controls'),
+      },
+      {
+        title: t('tour.week_title'),
+        intro: t('tour.week'),
+        element: document.querySelector('.time-tracker-week-details'),
+      },
+      ...shouldShowEntryTour() ? getEntryTourSteps() : [
+        {
+          title: t('tour.part1_end_title'),
+          intro: t('tour.part1_end'),
+        },
+      ],
+    ],
+  });
+});
 
 registerInterval(() => {
   potentialEnd.value = new Date();

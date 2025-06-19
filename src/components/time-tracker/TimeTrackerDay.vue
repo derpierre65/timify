@@ -1,8 +1,9 @@
 <template>
-  <div class="tw:border tw:w-full tw:border-neutral-600 tw:flex tw:flex-col tw:sm:flex-row">
-    <div
-      class="info-box tw:border-b tw:sm:border-b-0 tw:sm:border-r"
-    >
+  <div
+    :class="{'has-entries': sortedEntries.length}"
+    class="time-tracker-day tw:border tw:w-full tw:border-neutral-600 tw:flex tw:flex-col tw:sm:flex-row"
+  >
+    <div class="info-box tw:border-b tw:sm:border-b-0 tw:sm:border-r">
       <span class="tw:font-semibold">{{ $t(`days.${day.dayOfWeek}`) }}</span>
       <span class="tw:text-xs">{{ day.formattedDate }}</span>
     </div>

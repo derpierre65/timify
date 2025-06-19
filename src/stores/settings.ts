@@ -10,6 +10,11 @@ const useSettingsStore = defineStore('settings', () => {
     showWarningDialog: true, // Show warning dialog if merge would exceed warnTime
     warningTime: 60, // Shows warning if merge would exceed this number of seconds
   });
+  const finishedTours = ref<string[]>([]);
+
+  function finishTour(tour: string) {
+    finishedTours.value.push(tour);
+  }
 
   return {
     dateFormat,
@@ -17,6 +22,8 @@ const useSettingsStore = defineStore('settings', () => {
     firstWeekDay,
     mergeSettings,
     storageType,
+    finishedTours,
+    finishTour,
   };
 }, {
   persist: true,
