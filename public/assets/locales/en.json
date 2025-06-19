@@ -1,6 +1,8 @@
 {
   "global": {
     "delete": "Delete",
+    "save": "Save",
+    "cancel": "Cancel",
     "close": "Close",
     "confirm": "Confirm"
   },

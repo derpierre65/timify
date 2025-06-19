@@ -6,7 +6,7 @@
       <span class="tw:font-semibold">{{ $t(`days.${day.dayOfWeek}`) }}</span>
       <span class="tw:text-xs">{{ day.formattedDate }}</span>
     </div>
-    <div class="tw:flex-auto tw:bg-stone-900 relative-position tw:group">
+    <div class="tw:flex-auto tw:bg-stone-900 relative-position tw:group tw:divide-solid tw:divide-neutral-600 tw:divide-y-1">
       <!-- soon -->
       <div
         v-if="false"
@@ -30,9 +30,7 @@
         @merge="mergeEntries(entry, index, $event)"
       />
     </div>
-    <div
-      class="info-box tw:border-t tw:sm:border-t-0 tw:sm:border-l"
-    >
+    <div class="info-box tw:border-t tw:sm:border-t-0 tw:sm:border-l">
       <span class="tw:font-semibold">
         <span>{{ formattedWorkTime.hours }}h {{ formattedWorkTime.minutes }}m</span>
         <q-tooltip>{{ $t('table.work_time') }}</q-tooltip>
@@ -203,5 +201,6 @@ function showMergeDialog(
 .info-box {
   @apply tw:px-2 tw:py-1 tw:text-sm tw:text-center tw:flex tw:flex-wrap tw:items-center tw:justify-between;
   @apply tw:sm:justify-center tw:content-center tw:bg-stone-950 tw:border-neutral-600 tw:gap-0.5 tw:w-full tw:sm:w-24;
+  @apply tw:shrink-0;
 }
 </style>
