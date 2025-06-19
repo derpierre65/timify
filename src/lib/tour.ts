@@ -85,8 +85,6 @@ function getEntryTourSteps() {
 function startTour(id: string | string[], options: Partial<Options>) {
   id = Array.isArray(id) ? id : [ id, ];
 
-  console.log(id);
-
   return introJs()
     .setOptions(options)
     .onbeforeexit(function() {

@@ -155,6 +155,13 @@ async function triggerAction(status: TimeTrackerStatus) {
       type: status === TimeTrackerStatus.Running ? TimeTrackerEntryType.Work : TimeTrackerEntryType.Break,
     });
   }
+
+  if (!settingsStore.finishedTours.includes('entry')) {
+    await nextTick();
+    await startTour('entry', {
+      steps: getEntryTourSteps(),
+    });
+  }
 }
 
 onMounted(async() => {
