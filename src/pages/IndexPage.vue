@@ -73,6 +73,7 @@ import { computed, ref } from 'vue';
 import { getWeekStartEnd, parseSeconds } from 'src/lib/date';
 import TimeTrackerWeek from 'components/time-tracker/TimeTrackerWeek.vue';
 import { date, uid, useInterval } from 'quasar';
+import EntryResource from 'src/lib/resources/EntryResource';
 
 const timeTrackerStore = useTimeTrackerStore();
 const { registerInterval, } = useInterval();
@@ -106,7 +107,7 @@ function onLoad(index: number, done) {
   done();
 }
 
-function triggerAction(status: TimeTrackerStatus) {
+async function triggerAction(status: TimeTrackerStatus) {
   potentialEnd.value = new Date();
   if (timeTrackerStore.currentEntry) {
     const endOfDate = date.endOfDate(timeTrackerStore.currentEntry.start, 'day');
@@ -125,12 +126,10 @@ function triggerAction(status: TimeTrackerStatus) {
           timeTrackerStore.currentEntry.end = new Date(endTime);
         }
         else {
-          timeTrackerStore.entries.push({
-            uid: uid(),
+          await EntryResource.instance.store({
             start: new Date(currentStart),
             end: new Date(endTime),
-            type: type,
-            pushedToJira: false,
+            type,
           });
         }
 
@@ -143,12 +142,9 @@ function triggerAction(status: TimeTrackerStatus) {
   }
 
   if (status !== TimeTrackerStatus.Stopped) {
-    timeTrackerStore.entries.push({
-      uid: uid(),
+    await EntryResource.instance.store({
       start: new Date(),
       type: status === TimeTrackerStatus.Running ? TimeTrackerEntryType.Work : TimeTrackerEntryType.Break,
-      end: null,
-      pushedToJira: false,
     });
   }
 }

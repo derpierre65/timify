@@ -1,6 +1,8 @@
 import { defineStore } from 'pinia';
 import { computed, ref } from 'vue';
 import { date } from 'quasar';
+import { StoreApiStoreFunctions } from 'src/lib/resources/interfaces/PiniaStoreApiInterface';
+import { useCrudStore } from 'src/composables/store/crudStore';
 
 type TimeTrackerEntry = {
   uid: string;
@@ -23,6 +25,7 @@ enum TimeTrackerStatus {
 
 const useTimeTrackerStore = defineStore('timeTracker', () => {
   const entries = ref<TimeTrackerEntry[]>([]);
+  const crudFunctions = useCrudStore(entries);
 
   const groupedEntries = computed(() => {
     const start = Date.now();
@@ -62,7 +65,8 @@ const useTimeTrackerStore = defineStore('timeTracker', () => {
     groupedEntries,
     currentEntry,
     currentStatus,
-  };
+    ...crudFunctions,
+  } satisfies StoreApiStoreFunctions<TimeTrackerEntry> & Record<string, unknown>;
 }, {
   persist: {
     serializer: {
@@ -72,7 +76,7 @@ const useTimeTrackerStore = defineStore('timeTracker', () => {
       deserialize(state) {
         const deserialized = JSON.parse(state);
 
-        deserialized.entries.map((entry) => {
+        deserialized.entries.map((entry: TimeTrackerEntry) => {
           entry.start = new Date(entry.start);
           if (entry.end) {
             entry.end = new Date(entry.end);

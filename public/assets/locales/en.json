@@ -4,6 +4,9 @@
     "close": "Close",
     "confirm": "Confirm"
   },
+  "error": {
+    "unknown": "Unknown error."
+  },
   "days": [
     "Sunday",
     "Monday",

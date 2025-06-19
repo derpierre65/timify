@@ -88,11 +88,13 @@
 </template>
 
 <script setup lang="ts">
-import { TimeTrackerEntry, TimeTrackerEntryType, useTimeTrackerStore } from 'stores/timeTracker';
+import { TimeTrackerEntry, TimeTrackerEntryType } from 'stores/timeTracker';
 import { computed, inject, Ref } from 'vue';
-import { date } from 'quasar';
+import { date, Loading } from 'quasar';
 import { parseSeconds } from 'src/lib/date';
 import { currentDateInjectionKey } from 'src/lib/keys';
+import EntryResource from 'src/lib/resources/EntryResource';
+import { catchError } from 'src/lib/functions';
 
 const props = defineProps<{
   entry: TimeTrackerEntry;
@@ -105,7 +107,6 @@ defineEmits<{
 }>();
 
 const currentDate = inject<Ref<Date>>(currentDateInjectionKey)!;
-const timeTrackerStore = useTimeTrackerStore();
 
 const startTime = computed(() => {
   return date.formatDate(props.entry.start, 'HH:mm');
@@ -129,7 +130,12 @@ const formattedTotalTime = computed(() => {
   return parseSeconds(totalTime.value);
 });
 
-function deleteEntry() {
-  timeTrackerStore.entries.splice(timeTrackerStore.entries.indexOf(props.entry), 1);
+async function deleteEntry() {
+  Loading.show();
+
+  EntryResource.instance
+    .destroy(props.entry.uid)
+    .catch(catchError)
+    .finally(() => Loading.hide());
 }
 </script>
