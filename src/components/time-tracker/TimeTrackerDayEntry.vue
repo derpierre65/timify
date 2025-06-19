@@ -7,7 +7,7 @@
     <div class="tw:w-12">
       <TimeTrackerTimeInput
         v-if="editMode"
-        v-model="editStart"
+        v-model="editStart!"
         :autofocus="editFocus === 'start'"
         dense
         @keyup.enter="saveEdit"
@@ -104,7 +104,17 @@
                 <q-item-label>{{ $t('global.delete') }}</q-item-label>
               </q-item-section>
             </q-item>
-            <!-- todo add change -->
+            <q-item v-close-popup clickable @click="toggleEntryType">
+              <q-item-section>
+                <q-item-label>
+                  {{
+                    $t(entry.type === TimeTrackerEntryType.Work
+                      ? 'table.actions.change_to_break'
+                      : 'table.actions.change_to_work')
+                  }}
+                </q-item-label>
+              </q-item-section>
+            </q-item>
             <!-- todo add jira push -->
           </q-list>
         </q-menu>
@@ -198,11 +208,22 @@ function saveEdit() {
     .finally(() => Loading.hide());
 }
 
-async function deleteEntry() {
+function deleteEntry() {
   Loading.show();
 
   EntryResource.instance
     .destroy(props.entry.uid)
+    .catch(catchError)
+    .finally(() => Loading.hide());
+}
+
+function toggleEntryType() {
+  Loading.show();
+
+  EntryResource.instance
+    .update(props.entry.uid, {
+      type: props.entry.type === TimeTrackerEntryType.Work ? TimeTrackerEntryType.Break : TimeTrackerEntryType.Work,
+    })
     .catch(catchError)
     .finally(() => Loading.hide());
 }

@@ -36,7 +36,9 @@
     "project_code": "Project code",
     "actions": {
       "merge_up": "Merge upward",
-      "merge_down": "Merge downward "
+      "merge_down": "Merge downward",
+      "change_to_break": "Change to Break",
+      "change_to_work": "Change to Work"
     }
   },
   "merge": {
