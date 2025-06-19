@@ -11,6 +11,7 @@ const useSettingsStore = defineStore('settings', () => {
     warningTime: 60, // Shows warning if merge would exceed this number of seconds
   });
   const finishedTours = ref<string[]>([]);
+  const hideFooter = ref(false);
 
   function finishTour(tour: string) {
     finishedTours.value.push(tour);
@@ -23,6 +24,7 @@ const useSettingsStore = defineStore('settings', () => {
     mergeSettings,
     storageType,
     finishedTours,
+    hideFooter,
     finishTour,
   };
 }, {

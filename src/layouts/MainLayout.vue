@@ -10,7 +10,7 @@
       <router-view />
     </q-page-container>
 
-    <q-footer class="q-pa-sm tw:bg-neutral-700!" bordered>
+    <q-footer v-if="!settingsStore.hideFooter" class="q-pa-sm tw:bg-neutral-900!" bordered>
       <div class="tw:container q-mx-auto flex">
         <div>
           This is an <a
@@ -35,4 +35,10 @@
     </q-footer>
   </q-layout>
 </template>
+
+<script lang="ts" setup>
+import { useSettingsStore } from 'stores/settings';
+
+const settingsStore = useSettingsStore();
+</script>
 
