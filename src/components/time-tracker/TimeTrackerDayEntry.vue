@@ -112,6 +112,11 @@
         <q-menu>
           <q-list>
             <q-item v-close-popup clickable @click="toggleEntryType">
+              <q-item-section side>
+                <q-item-label>
+                  <q-icon :name="entry.type === TimeTrackerEntryType.Work ? 'fa fa-coffee tw:text-green-600' : 'fas fa-desktop'" />
+                </q-item-label>
+              </q-item-section>
               <q-item-section>
                 <q-item-label>
                   {{
@@ -123,6 +128,11 @@
               </q-item-section>
             </q-item>
             <q-item v-close-popup clickable @click="deleteEntry">
+              <q-item-section side>
+                <q-item-label>
+                  <q-icon name="fas fa-trash tw:text-red-400" />
+                </q-item-label>
+              </q-item-section>
               <q-item-section>
                 <q-item-label>{{ $t('global.delete') }}</q-item-label>
               </q-item-section>
