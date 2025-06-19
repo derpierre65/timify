@@ -47,7 +47,7 @@
 
 <script setup lang="ts">
 import { computed, inject, Ref, watchEffect } from 'vue';
-import { date, Dialog, Notify } from 'quasar';
+import { date, Dialog } from 'quasar';
 import { getDaysBetween, parseSeconds } from 'src/lib/date';
 import { TimeTrackerEntry, TimeTrackerEntryType, useTimeTrackerStore } from 'stores/timeTracker';
 import { useSettingsStore } from 'stores/settings';
@@ -55,6 +55,8 @@ import TimeTrackerDayEntry from 'components/time-tracker/TimeTrackerDayEntry.vue
 import { currentDateInjectionKey } from 'src/lib/keys';
 import TimeTrackerMergeDialog from 'components/time-tracker/TimeTrackerMergeDialog.vue';
 import { useTranslation } from 'i18next-vue';
+import EntryResource from 'src/lib/resources/EntryResource';
+import { showSuccessMessage } from 'src/lib/ui';
 
 const props = defineProps<{
   day: ReturnType<typeof getDaysBetween>[0];
@@ -117,8 +119,8 @@ watchEffect(() => {
   });
 });
 
-function mergeEntries(entry: TimeTrackerEntry, index: number, mergeType: 'down' | 'up') {
-  const deletingEntry = timeTrackerStore.entries.find((element) => element.uid === entry.uid);
+async function mergeEntries(entry: TimeTrackerEntry, index: number, mergeType: 'down' | 'up') {
+  const deletingEntry = await EntryResource.instance.show(entry.uid);
   if (!deletingEntry) {
     return;
   }
@@ -129,7 +131,7 @@ function mergeEntries(entry: TimeTrackerEntry, index: number, mergeType: 'down' 
     return;
   }
 
-  const otherEntry = timeTrackerStore.entries.find((otherEntry) => otherEntry.uid === refEntry.uid);
+  const otherEntry = await EntryResource.instance.show(refEntry.uid);
   if (!otherEntry) {
     console.error('other entry not found? (merge down)');
     return;
@@ -146,12 +148,21 @@ function mergeEntries(entry: TimeTrackerEntry, index: number, mergeType: 'down' 
     updateKey = 'start';
   }
 
-  if (showMergeDialog(additionalTime, otherEntry, deletingEntry, updateKey)) {
+  let update: Partial<TimeTrackerEntry> = {
+    [updateKey]: deletingEntry[updateKey]!,
+  };
+  const mergeUpdate = await showMergeDialog(additionalTime, otherEntry, deletingEntry, updateKey);
+  if (mergeUpdate === false) {
     return;
   }
+  else if (mergeUpdate) {
+    update = mergeUpdate;
+  }
 
-  otherEntry[updateKey] = deletingEntry[updateKey]!;
-  deleteEntry(deletingEntry);
+  await EntryResource.instance.destroy(deletingEntry.uid);
+  await EntryResource.instance.update(otherEntry.uid, update);
+
+  showSuccessMessage(t('merge.merged'));
 }
 
 function showMergeDialog(
@@ -161,33 +172,27 @@ function showMergeDialog(
   updateKey: keyof TimeTrackerEntry,
 ) {
   if (!settingsStore.mergeSettings.showWarningDialog || additionalTime < settingsStore.mergeSettings.warningTime) {
-    return false;
+    return null;
   }
 
-  Dialog.create({
-    component: TimeTrackerMergeDialog,
-    componentProps: {
-      additionalTime,
-      updateKey,
-      from: from,
-      to: to,
-    },
-  })
-    .onOk(({ start, end, }) => {
-      to.start = start;
-      to.end = end;
-      deleteEntry(from);
-    });
-
-  return true;
-}
-
-function deleteEntry(entry: TimeTrackerEntry) {
-  timeTrackerStore.entries.splice(timeTrackerStore.entries.indexOf(entry), 1);
-  Notify.create({
-    type: 'positive',
-    message: t('merge.merged'),
-    position: 'top',
+  return new Promise((resolve) => {
+    Dialog.create({
+      component: TimeTrackerMergeDialog,
+      componentProps: {
+        additionalTime,
+        updateKey,
+        from: from,
+        to: to,
+      },
+    })
+      .onOk(({ start, end, }) => {
+        resolve({
+          start,
+          end,
+        } as Partial<TimeTrackerEntry>);
+      })
+      .onDismiss(() => resolve(false))
+      .onCancel(() => resolve(false));
   });
 }
 </script>
