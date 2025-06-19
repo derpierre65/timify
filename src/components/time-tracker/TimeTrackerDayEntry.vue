@@ -111,11 +111,6 @@
       >
         <q-menu>
           <q-list>
-            <q-item v-close-popup clickable @click="deleteEntry">
-              <q-item-section>
-                <q-item-label>{{ $t('global.delete') }}</q-item-label>
-              </q-item-section>
-            </q-item>
             <q-item v-close-popup clickable @click="toggleEntryType">
               <q-item-section>
                 <q-item-label>
@@ -125,6 +120,11 @@
                       : 'table.actions.change_to_work')
                   }}
                 </q-item-label>
+              </q-item-section>
+            </q-item>
+            <q-item v-close-popup clickable @click="deleteEntry">
+              <q-item-section>
+                <q-item-label>{{ $t('global.delete') }}</q-item-label>
               </q-item-section>
             </q-item>
             <!-- todo add jira push -->
