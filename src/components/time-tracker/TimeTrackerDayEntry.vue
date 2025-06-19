@@ -84,10 +84,9 @@
 
     <q-space />
 
-    <div class="flex items-center">
+    <div class="flex items-center time-tracker-day-options">
       <q-btn
         v-if="canMergeUpwards"
-        class="time-tracker-day-merge-button"
         icon="fas fa-arrow-up"
         size="sm"
         round
@@ -97,7 +96,6 @@
       </q-btn>
       <q-btn
         v-if="canMergeDownwards"
-        class="time-tracker-day-merge-button"
         icon="fas fa-arrow-down"
         size="sm"
         round
@@ -107,7 +105,6 @@
       </q-btn>
 
       <q-btn
-        class="time-tracker-day-options-button"
         icon="fas fa-ellipsis-h"
         size="sm"
         round

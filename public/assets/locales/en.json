@@ -80,8 +80,7 @@
         "project": "Here you can specify a client/project, allowing you to group work times.",
         "project_code": "Here you can specify a project code to further categorize your tracked time for a client/project, for example, a ticket number.",
         "options_title": "Entry Options",
-        "options_merge": "Here you can merge two entries. Either upwards or downwards, depending on where an entry is located. This will transfer the start or end time to the other entry. The type of your tracked time will not change.",
-        "options_more": "Here you can access more options, such as turning work time into break time, break time into work time, deleting the entry, or transferring the tracked time to Jira."
+        "options_more": "Here you can access more options, such as turning work time into break time, break time into work time, deleting the entry, or transferring the tracked time to Jira. You can also merge two entries. Either upwards or downwards, depending on where an entry is located. This will transfer the start or end time to the other entry. The type of your tracked time will not change."
       }
     },
     "ready_to_go_title": "Tour ended \uD83C\uDF89",

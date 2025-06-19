@@ -59,13 +59,9 @@ function getEntryTourSteps() {
 
     {
       title: i18next.t('tour.day.entry.options_title'),
-      intro: i18next.t('tour.day.entry.options_merge'),
-      element: document.querySelector('.time-tracker-day.has-entries .time-tracker-day-merge-button'),
-    },
-    {
-      title: i18next.t('tour.day.entry.options_title'),
       intro: i18next.t('tour.day.entry.options_more'),
-      element: document.querySelector('.time-tracker-day.has-entries .time-tracker-day-options-button'),
+      position: 'left',
+      element: document.querySelector('.time-tracker-day.has-entries .time-tracker-day-options'),
     },
 
     {
