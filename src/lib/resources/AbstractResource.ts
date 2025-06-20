@@ -12,6 +12,10 @@ export default abstract class AbstractResource<T> {
       this.initializeInterface(useSettingsStore().storageType);
     }
 
+    index(params: object, config?: object): Promise<T[]> {
+      return this.interface!.index(params, config);
+    }
+
     show(id: string | number, config?: object): Promise<T> {
       return this.interface!.show(id, config);
     }
@@ -28,16 +32,12 @@ export default abstract class AbstractResource<T> {
       return this.interface!.destroy(id, config);
     }
 
-    protected static getInstance<TInstance>(): TInstance {
+    static get instance(): InstanceType<this> {
       if (!this._instance) {
         this._instance = new this();
       }
 
-      return this._instance as TInstance;
-    }
-
-    static get instance(): this {
-      return this.getInstance();
+      return this._instance;
     }
 
     public getDefaultValues(): T {

@@ -5,7 +5,7 @@ import { StoreApiStoreFunctions } from 'src/lib/resources/interfaces/PiniaStoreA
 import { useCrudStore } from 'src/composables/store/crudStore';
 
 type TimeTrackerEntry = {
-  uid: string;
+  uid: string | number;
   start: Date;
   end: Date | null;
   type: TimeTrackerEntryType;

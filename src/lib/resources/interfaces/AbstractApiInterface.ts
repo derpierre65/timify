@@ -1,5 +1,9 @@
 
 export default class AbstractApiInterface<T, TConfig = object> {
+  index(params: object, config?: object) {
+    return Promise.reject('index is not implemented');
+  }
+
   show(id: string | number, config: TConfig): Promise<T> {
     return Promise.reject('show is not implemented');
   }

@@ -15,8 +15,4 @@ export default class EntryResource extends AbstractResource<TimeTrackerEntry> {
   override get piniaStore() {
     return useTimeTrackerStore();
   }
-
-  static override get instance() {
-    return super.getInstance<EntryResource>();
-  }
 }

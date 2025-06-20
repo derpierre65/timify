@@ -2,17 +2,23 @@ import AbstractApiInterface from 'src/lib/resources/interfaces/AbstractApiInterf
 import { Store } from 'pinia';
 import AbstractResource from 'src/lib/resources/AbstractResource';
 import { uid } from 'quasar';
+import type { ApiPaginationResponse } from 'src/types/api';
 
 type StoreApiStoreFunctions<T> = {
   find: (id: string | number) => Promise<T>;
   create: (data: T) => Promise<T>;
   update: (id: string | number, data: Partial<T>) => Promise<T>;
   remove: (id: string | number) => Promise<void>;
+  index: (params: object, config?: object) => Promise<ApiPaginationResponse<T>>;
 };
 
 class PiniaStoreApiInterface<T> extends AbstractApiInterface<T, object> {
   constructor(private resource: AbstractResource<T>, private piniaStore: Store<string, StoreApiStoreFunctions<T>>) {
     super();
+  }
+
+  override index(params: object, config?: object) {
+    return this.piniaStore.index(params, config);
   }
 
   override show(id: string | number, config?: object) {
