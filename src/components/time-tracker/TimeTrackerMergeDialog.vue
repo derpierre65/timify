@@ -62,7 +62,7 @@
           </TimeTrackerMergeDialogEntryBox>
 
           <AppAlert v-if="!isValidStart" type="error" text dense>
-            {{ $t('merge.start_must_before_end') }}
+            {{ $t('error.start_must_before_end') }}
           </AppAlert>
         </q-card-section>
       </div>

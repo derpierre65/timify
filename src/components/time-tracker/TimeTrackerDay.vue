@@ -10,17 +10,30 @@
     <div class="tw:flex-auto tw:bg-stone-900 relative-position tw:group tw:divide-solid tw:divide-neutral-600 tw:divide-y-1">
       <!-- soon -->
       <div
-        v-if="false"
         class="absolute tw:hidden tw:group-hover:block tw:z-20 tw:p-1 tw:text-xs tw:border
         tw:bg-neutral-800 tw:border-neutral-600 tw:-top-2 tw:space-x-2"
       >
-        <q-icon name="fas fa-desktop" class="cursor-pointer tw:text-neutral-500">
-          <q-tooltip>TODO</q-tooltip>
+        <q-icon
+          name="fas fa-desktop"
+          class="cursor-pointer tw:text-neutral-500"
+          @click="createEntry(TimeTrackerEntryType.Work)"
+        >
+          <q-tooltip>{{ $t('table.create_entry_work') }}</q-tooltip>
         </q-icon>
-        <q-icon name="fas fa-coffee" class="cursor-pointer tw:text-green-600">
-          <q-tooltip>TODO</q-tooltip>
+        <q-icon
+          name="fas fa-coffee"
+          class="cursor-pointer tw:text-green-600"
+          @click="createEntry(TimeTrackerEntryType.Break)"
+        >
+          <q-tooltip>{{ $t('table.create_entry_break') }}</q-tooltip>
         </q-icon>
       </div>
+
+      <TimeTrackerDayEntry
+        v-if="tempItem"
+        :entry="tempItem"
+        @cancel-edit="tempItem = null"
+      />
 
       <TimeTrackerDayEntry
         v-for="(entry, index) in sortedEntries"
@@ -45,7 +58,13 @@
 </template>
 
 <script setup lang="ts">
-import { computed, inject, Ref, watchEffect } from 'vue';
+import {
+  computed,
+  inject,
+  ref,
+  Ref,
+  watchEffect,
+} from 'vue';
 import { date, Dialog } from 'quasar';
 import { getDaysBetween, parseSeconds } from 'src/lib/date';
 import { TimeTrackerEntry, TimeTrackerEntryType, useTimeTrackerStore } from 'stores/timeTracker';
@@ -67,6 +86,8 @@ const emit = defineEmits<{
     breakTime: number;
   }];
 }>();
+
+const tempItem = ref<TimeTrackerEntry | null>(null);
 
 defineOptions({
   name: 'TimeTrackerDay',
@@ -193,6 +214,17 @@ function showMergeDialog(
       .onDismiss(() => resolve(false))
       .onCancel(() => resolve(false));
   });
+}
+
+function createEntry(type: TimeTrackerEntryType) {
+  const defaultDate = new Date(dateIdentifier.value + ' ' + date.formatDate(new Date(), 'HH:mm:00'));
+
+  tempItem.value = {
+    ...EntryResource.instance.getDefaultValues(),
+    start: defaultDate,
+    end: defaultDate,
+    type,
+  };
 }
 </script>
 

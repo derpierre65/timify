@@ -1,6 +1,7 @@
 import AbstractApiInterface from 'src/lib/resources/interfaces/AbstractApiInterface';
 import { Store } from 'pinia';
 import AbstractResource from 'src/lib/resources/AbstractResource';
+import { uid } from 'quasar';
 
 type StoreApiStoreFunctions<T> = {
   find: (id: string | number) => Promise<T>;
@@ -22,6 +23,7 @@ class PiniaStoreApiInterface<T> extends AbstractApiInterface<T, object> {
     return this.piniaStore.create({
       ...this.resource.getDefaultValues(),
       ...data,
+      uid: uid(),
     });
   }
 

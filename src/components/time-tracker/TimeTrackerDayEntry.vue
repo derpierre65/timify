@@ -155,6 +155,7 @@ import EntryResource from 'src/lib/resources/EntryResource';
 import { catchError } from 'src/lib/functions';
 import TimeTrackerTimeInput from 'components/time-tracker/TimeTrackerTimeInput.vue';
 import { showErrorMessage } from 'src/lib/ui';
+import { useTranslation } from 'i18next-vue';
 
 const props = defineProps<{
   entry: TimeTrackerEntry;
@@ -162,11 +163,14 @@ const props = defineProps<{
   canMergeDownwards?: boolean;
 }>();
 
-defineEmits<{
+const emit = defineEmits<{
   merge: [type: 'down' | 'up'];
+  cancelEdit: [];
 }>();
 
+const { t, } = useTranslation();
 const currentDate = inject<Ref<Date>>(currentDateInjectionKey)!;
+
 const editStart = ref<Date | null>(null);
 const editEnd = ref<Date | null>(null);
 const editFocus = ref<string>('start');
@@ -205,6 +209,7 @@ function cancelEdit() {
   editMode.value = false;
   editEnd.value = null;
   editStart.value = null;
+  emit('cancelEdit');
 }
 
 function saveEdit() {
@@ -213,11 +218,26 @@ function saveEdit() {
   }
 
   if (editStart.value > (editEnd.value || currentDate.value)) {
-    showErrorMessage(':(');
+    showErrorMessage(t('error.start_must_before_end'));
     return;
   }
 
   Loading.show();
+  if (!props.entry.uid) {
+    EntryResource.instance
+      .store({
+        ...props.entry,
+        start: editStart.value,
+        end: editEnd.value,
+      })
+      .then(() => {
+        cancelEdit();
+      })
+      .catch(catchError)
+      .finally(() => Loading.hide());
+    return;
+  }
+
   EntryResource.instance
     .update(props.entry.uid, {
       start: editStart.value,
@@ -248,5 +268,9 @@ function toggleEntryType() {
     })
     .catch(catchError)
     .finally(() => Loading.hide());
+}
+
+if (!props.entry.uid) {
+  startEditMode('start');
 }
 </script>

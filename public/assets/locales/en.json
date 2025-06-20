@@ -7,7 +7,8 @@
     "confirm": "Confirm"
   },
   "error": {
-    "unknown": "Unknown error."
+    "unknown": "Unknown error.",
+    "start_must_before_end": "Start must be before End."
   },
   "days": [
     "Sunday",
@@ -34,6 +35,8 @@
     "break_time": "Break time",
     "project": "Client/Project",
     "project_code": "Project code",
+    "create_entry_work": "Create Work Entry",
+    "create_entry_break": "Create Break Entry",
     "actions": {
       "merge_up": "Merge upward",
       "merge_down": "Merge downward",
@@ -46,8 +49,7 @@
     "info": "Merging these entries would change the time by {change}",
     "to": "will be merged with",
     "current_difference": "Current difference",
-    "merged": "Entries have been merged.",
-    "start_must_before_end": "Start must be before End."
+    "merged": "Entries have been merged."
   },
   "actions": {
     "start_work": "Start work",

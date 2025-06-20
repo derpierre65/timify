@@ -1,11 +1,10 @@
 import AbstractResource from 'src/lib/resources/AbstractResource';
 import { TimeTrackerEntry, TimeTrackerEntryType, useTimeTrackerStore } from 'stores/timeTracker';
-import { uid } from 'quasar';
 
 export default class EntryResource extends AbstractResource<TimeTrackerEntry> {
   public override getDefaultValues(): TimeTrackerEntry {
     return {
-      uid: uid(),
+      uid: null!,
       start: new Date(),
       type: TimeTrackerEntryType.Work,
       end: null,

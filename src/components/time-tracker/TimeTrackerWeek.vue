@@ -5,7 +5,7 @@
       <span class="tw:text-xl">{{ formattedWorkTime.hours }}h {{ formattedWorkTime.minutes }}m</span>
     </div>
 
-    <div class="tw:space-y-4">
+    <div class="tw:space-y-2">
       <TimeTrackerDay
         v-for="day in days"
         :key="day.formattedDate"
