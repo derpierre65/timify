@@ -3,12 +3,15 @@ import { computed, ref } from 'vue';
 import { date } from 'quasar';
 import { StoreApiStoreFunctions } from 'src/lib/resources/interfaces/PiniaStoreApiInterface';
 import { useCrudStore } from 'src/composables/store/crudStore';
+import type { Project } from 'stores/project';
 
 type TimeTrackerEntry = {
   uid: string | number;
   start: Date;
   end: Date | null;
   type: TimeTrackerEntryType;
+  project: Project['uid'] | null;
+  project_code: string;
   pushedToJira: boolean;
 };
 
@@ -81,6 +84,8 @@ const useTimeTrackerStore = defineStore('timeTracker', () => {
           if (entry.end) {
             entry.end = new Date(entry.end);
           }
+          entry.project_code ??= '';
+          entry.project ??= null;
         });
 
         console.log('Loaded', deserialized.entries.length, 'entries');

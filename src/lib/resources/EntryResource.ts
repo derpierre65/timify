@@ -8,6 +8,8 @@ export default class EntryResource extends AbstractResource<TimeTrackerEntry> {
       start: new Date(),
       type: TimeTrackerEntryType.Work,
       end: null,
+      project: null,
+      project_code: '',
       pushedToJira: false,
     };
   }

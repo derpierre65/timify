@@ -5,14 +5,16 @@
     </i>
 
     <div class="tw:w-12">
-      <TimeTrackerTimeInput
-        v-if="editMode"
-        v-model="editStart!"
-        :autofocus="editFocus === 'start'"
-        dense
-        @keyup.enter="saveEdit"
-        @keyup.esc="cancelEdit"
-      />
+      <template v-if="editMode && editEntry">
+        <TimeTrackerTimeInput
+          v-model="editEntry.start"
+          :label="$t('table.start')"
+          :autofocus="editFocus === 'start'"
+          dense
+          @keyup.enter="saveEdit"
+          @keyup.esc="cancelEdit"
+        />
+      </template>
       <div v-else class="flex column" @click="startEditMode('start')">
         <span class="tw:text-xs">{{ $t('table.start') }}</span>
         <span>{{ startTime }}</span>
@@ -20,14 +22,16 @@
     </div>
 
     <div class="tw:w-12">
-      <TimeTrackerTimeInput
-        v-if="editMode && editEnd"
-        v-model="editEnd"
-        :autofocus="editFocus === 'end'"
-        dense
-        @keyup.enter="saveEdit"
-        @keyup.esc="cancelEdit"
-      />
+      <template v-if="editMode && editEntry">
+        <TimeTrackerTimeInput
+          v-model="editEntry.end"
+          :label="$t('table.end')"
+          :autofocus="editFocus === 'end'"
+          dense
+          @keyup.enter="saveEdit"
+          @keyup.esc="cancelEdit"
+        />
+      </template>
       <div v-else class="flex column" @click="startEditMode('end')">
         <span class="tw:text-xs">{{ $t('table.end') }}</span>
         <template v-if="endTime">
@@ -50,8 +54,20 @@
     </div>
 
     <div class="flex column">
-      <span class="tw:text-xs">{{ $t('table.project_code') }}</span>
-      <span>soon</span>
+      <template v-if="editEntry">
+        <q-input
+          v-model="editEntry.project_code"
+          :label="$t('table.project_code')"
+          :autofocus="editFocus === 'project_code'"
+          dense
+          @keyup.enter="saveEdit"
+          @keyup.esc="cancelEdit"
+        />
+      </template>
+      <div v-else class="flex column cursor-pointer" @click="startEditMode('project_code')">
+        <span class="tw:text-xs">{{ $t('table.project_code') }}</span>
+        <span>{{ entry.project_code || '-' }}</span>
+      </div>
     </div>
 
     <div v-if="editMode" class="tw:flex-initial">
@@ -171,9 +187,8 @@ const emit = defineEmits<{
 const { t, } = useTranslation();
 const currentDate = inject<Ref<Date>>(currentDateInjectionKey)!;
 
-const editStart = ref<Date | null>(null);
-const editEnd = ref<Date | null>(null);
-const editFocus = ref<string>('start');
+const editEntry = ref<TimeTrackerEntry | null>(null);
+const editFocus = ref<keyof TimeTrackerEntry>('start');
 const editMode = ref(false);
 
 const startTime = computed(() => {
@@ -189,35 +204,34 @@ const endTime = computed(() => {
 });
 
 const totalTime = computed(() => {
-  const end = editEnd.value || props.entry.end || currentDate.value;
+  const end = editEntry.value?.end || props.entry.end || currentDate.value;
 
-  return (end.getTime() - (editStart.value || props.entry.start).getTime()) / 1_000;
+  return (end.getTime() - (editEntry.value?.start || props.entry.start).getTime()) / 1_000;
 });
 
 const formattedTotalTime = computed(() => {
   return formatHourAndMinutes(totalTime.value);
 });
 
-function startEditMode(focusField: 'start' | 'end') {
-  editStart.value = props.entry.start;
-  editEnd.value = props.entry.end;
+function startEditMode(focusField: keyof TimeTrackerEntry) {
+  editEntry.value = Object.assign(Object.create(null), props.entry);
   editFocus.value = focusField;
   editMode.value = true;
 }
 
 function cancelEdit() {
   editMode.value = false;
-  editEnd.value = null;
-  editStart.value = null;
+  editEntry.value = null;
+
   emit('cancelEdit');
 }
 
 function saveEdit() {
-  if (!editStart.value) {
+  if (!editEntry.value || !editEntry.value.start) {
     return;
   }
 
-  if (editStart.value > (editEnd.value || currentDate.value)) {
+  if (editEntry.value.start > (editEntry.value.end || currentDate.value)) {
     showErrorMessage(t('error.start_must_before_end'));
     return;
   }
@@ -227,8 +241,7 @@ function saveEdit() {
     EntryResource.instance
       .store({
         ...props.entry,
-        start: editStart.value,
-        end: editEnd.value,
+        ...editEntry.value,
       })
       .then(() => {
         cancelEdit();
@@ -240,8 +253,10 @@ function saveEdit() {
 
   EntryResource.instance
     .update(props.entry.uid, {
-      start: editStart.value,
-      end: editEnd.value,
+      start: editEntry.value.start,
+      end: editEntry.value.end,
+      project: editEntry.value.project,
+      project_code: editEntry.value.project_code,
     })
     .then(() => {
       cancelEdit();
