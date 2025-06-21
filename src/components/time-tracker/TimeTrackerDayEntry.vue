@@ -48,12 +48,51 @@
       <span>{{ formattedTotalTime }}</span>
     </div>
 
-    <div class="flex column">
-      <span class="tw:text-xs">{{ $t('table.project') }}</span>
-      <span>soon</span>
+    <div
+      class="flex column"
+      :class="!editMode ? 'cursor-pointer tw:w-32' : 'tw:w-64'"
+      @click="startEditMode('project')"
+    >
+      <template v-if="editEntry">
+        <q-select
+          v-model="editEntry.project"
+          :options="projectStore.projects"
+          :label="$t('table.project')"
+          class="full-width"
+          option-value="uid"
+          option-label="name"
+          new-value-mode="add"
+          map-options
+          emit-value
+          clearable
+          dense
+          use-input
+          @new-value="addProject"
+        />
+      </template>
+      <template v-else>
+        <span class="tw:text-xs">{{ $t('table.project') }}</span>
+        <div class="full-width">
+          <q-badge
+            v-if="project"
+            class="overflow-hidden ellipsis tw:max-w-[100%] inline-block"
+            :style="{backgroundColor: project.color, color: projectTextColor}"
+            :label="project.name"
+          >
+            <q-tooltip v-if="project && project.name.length > 18">
+              {{ project.name }}
+            </q-tooltip>
+          </q-badge>
+          <span v-else>-</span>
+        </div>
+      </template>
     </div>
 
-    <div class="flex column">
+    <div
+      class="flex column"
+      :class="{'cursor-pointer': !editMode}"
+      @click="startEditMode('project_code')"
+    >
       <template v-if="editEntry">
         <q-input
           v-model="editEntry.project_code"
@@ -64,10 +103,10 @@
           @keyup.esc="cancelEdit"
         />
       </template>
-      <div v-else class="flex column cursor-pointer" @click="startEditMode('project_code')">
+      <template v-else>
         <span class="tw:text-xs">{{ $t('table.project_code') }}</span>
         <span>{{ entry.project_code || '-' }}</span>
-      </div>
+      </template>
     </div>
 
     <div v-if="editMode" class="tw:flex-initial">
@@ -172,6 +211,9 @@ import { catchError } from 'src/lib/functions';
 import TimeTrackerTimeInput from 'components/time-tracker/TimeTrackerTimeInput.vue';
 import { showErrorMessage } from 'src/lib/ui';
 import { useTranslation } from 'i18next-vue';
+import { useProjectStore } from 'stores/project';
+import ProjectResource from 'src/lib/resources/ProjectResource';
+import { getAccessibleTextColor } from 'src/lib/color';
 
 const props = defineProps<{
   entry: TimeTrackerEntry;
@@ -184,6 +226,7 @@ const emit = defineEmits<{
   cancelEdit: [];
 }>();
 
+const projectStore = useProjectStore();
 const { t, } = useTranslation();
 const currentDate = inject<Ref<Date>>(currentDateInjectionKey)!;
 
@@ -213,7 +256,27 @@ const formattedTotalTime = computed(() => {
   return formatHourAndMinutes(totalTime.value);
 });
 
+const project = computed(() => {
+  if (!props.entry.project) {
+    return null;
+  }
+
+  return projectStore.projects.find((project) => project.uid === props.entry.project);
+});
+
+const projectTextColor = computed(() => {
+  if (!project.value) {
+    return '#000000';
+  }
+
+  return getAccessibleTextColor(project.value.color);
+});
+
 function startEditMode(focusField: keyof TimeTrackerEntry) {
+  if (editMode.value) {
+    return;
+  }
+
   editEntry.value = Object.assign(Object.create(null), props.entry);
   editFocus.value = focusField;
   editMode.value = true;
@@ -283,6 +346,17 @@ function toggleEntryType() {
     })
     .catch(catchError)
     .finally(() => Loading.hide());
+}
+
+function addProject(value: string, done) {
+  ProjectResource.instance
+    .store({
+      name: value,
+    })
+    .then((data) => {
+      done(data);
+    })
+    .catch(catchError);
 }
 
 if (!props.entry.uid) {
