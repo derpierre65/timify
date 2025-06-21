@@ -1,13 +1,21 @@
 <template>
   <q-layout view="lHh Lpr lFf">
-    <q-drawer bordered>
-      <q-list>
-        Drawer
-      </q-list>
+    <q-drawer
+      class="tw:bg-gray-900 flex column"
+      persistent
+      show-if-above
+      bordered
+      :width="220"
+    >
+      <AppSidebar />
     </q-drawer>
 
     <q-page-container>
-      <router-view />
+      <q-page class="flex flex-col">
+        <keep-alive include="IndexPage">
+          <router-view />
+        </keep-alive>
+      </q-page>
     </q-page-container>
 
     <q-footer v-if="!settingsStore.hideFooter" class="q-pa-sm tw:bg-neutral-900!" bordered>
@@ -38,6 +46,7 @@
 
 <script lang="ts" setup>
 import { useSettingsStore } from 'stores/settings';
+import AppSidebar from 'components/AppSidebar.vue';
 
 const settingsStore = useSettingsStore();
 </script>
