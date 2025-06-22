@@ -32,7 +32,11 @@
           />
 
           <q-list bordered separator>
-            <q-item v-for="(pushEntry, index) in pushToInstances" :key="pushEntry.uid">
+            <q-item
+              v-for="(pushEntry, index) in pushToInstances"
+              :key="pushEntry.uid"
+              class="q-pr-sm"
+            >
               <q-item-section
                 v-if="pushEntry.error || pushEntry.sent || pushEntry.invalid || pushEntry.loading"
                 side
@@ -52,7 +56,7 @@
                 <q-icon v-else class="fas fa-check" color="green" />
               </q-item-section>
 
-              <q-item-section class="tw:grid! tw:grid-cols-8 tw:gap-4 items-center">
+              <q-item-section class="tw:grid! tw:sm:grid-cols-2 tw:md:grid-cols-8 tw:gap-4 items-center">
                 <q-select
                   v-model="pushEntry.cloudId"
                   :disable="pushEntry.sent || pushEntry.loading"
@@ -60,7 +64,7 @@
                   :options="selectableInstances"
                   option-label="name"
                   option-value="cloudId"
-                  class="tw:col-span-4"
+                  class="tw:md:col-span-4"
                   dense
                   emit-value
                   map-options
@@ -94,7 +98,7 @@
 
                 <div class="flex column">
                   <span class="tw:text-xs">{{ $t('table.total') }}</span>
-                  <span>{{ formatHourAndMinutes((pushEntry.end - pushEntry.start) / 1_000) }}</span>
+                  <span>{{ formatHourAndMinutes((pushEntry.end.getTime() - pushEntry.start.getTime()) / 1_000) }}</span>
                 </div>
 
                 <q-input
@@ -109,13 +113,29 @@
                 />
               </q-item-section>
 
-              <q-item-section v-if="pushToInstances.length > 1 && !pushEntry.sent && !pushEntry.loading" side>
-                <q-icon
-                  name="fas fa-trash"
+              <q-item-section class="tw:pl-0! tw:flex-row! tw:items-center!" side>
+                <q-btn
+                  v-if="pushEntry.end.getTime() - pushEntry.start.getTime() < 60_000"
+                  icon="fas fa-wand-magic-sparkles"
+                  color="purple"
+                  size="sm"
+                  round
+                  flat
+                  @click="adjustStart(pushEntry)"
+                >
+                  <q-tooltip>{{ $t('push_to_jira.adjust_start') }}</q-tooltip>
+                </q-btn>
+                <q-btn
+                  v-if="pushToInstances.length > 1 && !pushEntry.sent && !pushEntry.loading"
+                  icon="fas fa-trash"
                   color="negative"
-                  class="cursor-pointer"
+                  size="sm"
+                  round
+                  flat
                   @click="pushToInstances.splice(index, 1)"
-                />
+                >
+                  <q-tooltip>{{ $t('global.delete') }}</q-tooltip>
+                </q-btn>
               </q-item-section>
             </q-item>
           </q-list>
@@ -366,6 +386,12 @@ async function confirm() {
 
   showSuccessMessage(t('push_to_jira.success'));
   onDialogOK();
+}
+
+function adjustStart(entry: typeof pushToInstances.value[0]) {
+  const diff = 60_000 - (entry.end.getTime() - entry.start.getTime());
+  entry.start = new Date(entry.start.getTime() - diff);
+  validateEntry(entry);
 }
 
 (() => {

@@ -64,6 +64,7 @@
     "comment_all_issues": "Comment for all issues",
     "push_confirm": "There are invalid entries that will be ignored when submitting to Jira. Would you like to continue?",
     "success": "Your time entries have been pushed to Jira.",
+    "adjust_start": "Adjust Start to 1 minute work time.",
     "errors": {
       "no_instance": "No Jira instance selected.",
       "no_issue_id": "No Issue ID selected.",
