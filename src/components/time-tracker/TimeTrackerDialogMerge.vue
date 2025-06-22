@@ -24,17 +24,17 @@
             </i18next>
           </AppAlert>
 
-          <TimeTrackerMergeDialogEntryBox :start="from.start" :end="from.end" />
+          <TimeTrackerDialogMergeEntryBox :start="from.start" :end="from.end" />
 
           <div>
             <span>{{ $t('merge.to') }}</span>
           </div>
 
-          <TimeTrackerMergeDialogEntryBox :start="to.start" :end="to.end" />
+          <TimeTrackerDialogMergeEntryBox :start="to.start" :end="to.end" />
 
           <q-separator />
 
-          <TimeTrackerMergeDialogEntryBox :start="newStart" :end="newEnd">
+          <TimeTrackerDialogMergeEntryBox :start="newStart" :end="newEnd">
             <template #start>
               <TimeTrackerTimeInput
                 v-model="newStart"
@@ -59,7 +59,7 @@
                 :class="showWarning ? 'tw:text-red-400' : 'tw:text-green-400'"
               >{{ formattedAdditionalTime }}</span>
             </div>
-          </TimeTrackerMergeDialogEntryBox>
+          </TimeTrackerDialogMergeEntryBox>
 
           <AppAlert v-if="!isValidStart" type="error" text dense>
             {{ $t('error.start_must_before_end') }}
@@ -84,7 +84,7 @@
 import { computed, provide, ref } from 'vue';
 import { useDialogPluginComponent, useInterval } from 'quasar';
 import { formatHourAndMinutes } from 'src/lib/date';
-import TimeTrackerMergeDialogEntryBox from 'components/time-tracker/TimeTrackerMergeDialogEntryBox.vue';
+import TimeTrackerDialogMergeEntryBox from 'components/time-tracker/TimeTrackerDialogMergeEntryBox.vue';
 import { TimeTrackerEntry } from 'stores/timeTracker';
 import { currentDateInjectionKey } from 'src/lib/keys';
 import TimeTrackerTimeInput from 'components/time-tracker/TimeTrackerTimeInput.vue';

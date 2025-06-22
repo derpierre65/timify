@@ -71,7 +71,7 @@ import { TimeTrackerEntry, TimeTrackerEntryType, useTimeTrackerStore } from 'sto
 import { useSettingsStore } from 'stores/settings';
 import TimeTrackerDayEntry from 'components/time-tracker/TimeTrackerDayEntry.vue';
 import { currentDateInjectionKey } from 'src/lib/keys';
-import TimeTrackerMergeDialog from 'components/time-tracker/TimeTrackerMergeDialog.vue';
+import TimeTrackerDialogMerge from 'components/time-tracker/TimeTrackerDialogMerge.vue';
 import { useTranslation } from 'i18next-vue';
 import EntryResource from 'src/lib/resources/EntryResource';
 import { showSuccessMessage } from 'src/lib/ui';
@@ -88,10 +88,6 @@ const emit = defineEmits<{
 }>();
 
 const tempItem = ref<TimeTrackerEntry | null>(null);
-
-defineOptions({
-  name: 'TimeTrackerDay',
-});
 
 const timeTrackerStore = useTimeTrackerStore();
 const settingsStore = useSettingsStore();
@@ -197,7 +193,7 @@ function showMergeDialog(
 
   return new Promise((resolve) => {
     Dialog.create({
-      component: TimeTrackerMergeDialog,
+      component: TimeTrackerDialogMerge,
       componentProps: {
         additionalTime,
         updateKey,

@@ -27,10 +27,6 @@ const props = defineProps<{
   end: Date;
 }>();
 
-defineOptions({
-  name: 'TimeTrackerWeek',
-});
-
 const dayTimeInformation = ref<Record<string, {
   workTime: number;
   breakTime: number;
