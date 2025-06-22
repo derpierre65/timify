@@ -1,6 +1,6 @@
 <template>
-  <div class="flex column tw:flex-auto">
-    <div class="tw:text-center q-gutter-y-md q-pt-md">
+  <div class="flex column tw:flex-auto tw:max-w-full">
+    <div class="tw:text-center q-gutter-y-md q-pt-md tw:max-w-full q-px-sm">
       <!-- timer -->
       <div id="index-timer">
         <span class="tw:text-4xl tw:text-neutral-300">{{ currentTimer.hours }}</span>
@@ -47,11 +47,24 @@
           <q-tooltip>{{ $t('actions.stop_work') }}</q-tooltip>
         </q-btn>
       </div>
+
+      <ProjectSelect
+        v-model="settingsStore.defaultProjectId"
+        :label="$t('settings.default_project')"
+        dense
+        clearable
+      />
+      <q-input
+        v-model="settingsStore.defaultProjectCode"
+        :label="$t('settings.default_project_code')"
+        dense
+        clearable
+      />
     </div>
 
     <q-space />
 
-    <div class="tw:bg-neutral-800 tw.h-12 flex justify-end items-center border-t border-black q-pa-xs">
+    <div class="tw:bg-neutral-800 tw:h-12 flex justify-end items-center tw:border-t tw:border-white/28 q-pa-xs">
       <router-link
         :to="{name: 'settings'}"
         class="tw:hover:text-neutral-100 tw:hover:bg-neutral-900 tw:w-8 tw:h-8
@@ -65,7 +78,7 @@
 </template>
 
 <script setup lang="ts">
-import { TimeTrackerEntryType, TimeTrackerStatus, useTimeTrackerStore } from 'stores/timeTracker';
+import { TimeTrackerEntry, TimeTrackerEntryType, TimeTrackerStatus, useTimeTrackerStore } from 'stores/timeTracker';
 import { date } from 'quasar';
 import EntryResource from 'src/lib/resources/EntryResource';
 import { computed, inject, nextTick, Ref } from 'vue';
@@ -73,6 +86,7 @@ import { getEntryTourSteps, startTour } from 'src/lib/tour';
 import { parseSeconds } from 'src/lib/date';
 import { currentDateInjectionKey } from 'src/lib/keys';
 import { useSettingsStore } from 'stores/settings';
+import ProjectSelect from 'components/ProjectSelect.vue';
 
 const timeTrackerStore = useTimeTrackerStore();
 const settingsStore = useSettingsStore();
@@ -89,6 +103,15 @@ const currentTimer = computed(() => {
 
 async function triggerAction(status: TimeTrackerStatus) {
   currentDate.value = new Date();
+
+  const defaultFields: Partial<TimeTrackerEntry> = {};
+
+  if (settingsStore.defaultProjectId) {
+    defaultFields.project = settingsStore.defaultProjectId;
+  }
+  if (settingsStore.defaultProjectCode) {
+    defaultFields.project_code = settingsStore.defaultProjectCode;
+  }
 
   if (timeTrackerStore.currentEntry) {
     const endOfDate = date.endOfDate(timeTrackerStore.currentEntry.start, 'day');
@@ -111,6 +134,7 @@ async function triggerAction(status: TimeTrackerStatus) {
             start: new Date(currentStart),
             end: new Date(endTime),
             type,
+            ...defaultFields,
           });
         }
 
@@ -126,6 +150,7 @@ async function triggerAction(status: TimeTrackerStatus) {
     await EntryResource.instance.store({
       start: new Date(),
       type: status === TimeTrackerStatus.Running ? TimeTrackerEntryType.Work : TimeTrackerEntryType.Break,
+      ...defaultFields,
     });
   }
 

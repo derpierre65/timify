@@ -12,6 +12,8 @@ const useSettingsStore = defineStore('settings', () => {
   });
   const finishedTours = ref<string[]>([]);
   const hideFooter = ref(false);
+  const defaultProjectId = ref<string | null>(null);
+  const defaultProjectCode = ref<string>('');
 
   function finishTour(tour: string) {
     finishedTours.value.push(tour);
@@ -25,6 +27,8 @@ const useSettingsStore = defineStore('settings', () => {
     storageType,
     finishedTours,
     hideFooter,
+    defaultProjectId,
+    defaultProjectCode,
     finishTour,
   };
 }, {

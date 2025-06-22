@@ -80,6 +80,8 @@
     "stop_work": "Stop work"
   },
   "settings": {
+    "default_project": "Default Client/Project",
+    "default_project_code": "Default Project code",
     "tabs": {
       "jira_users": "Jira Users"
     },
