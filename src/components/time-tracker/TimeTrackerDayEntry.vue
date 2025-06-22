@@ -141,7 +141,7 @@
 
     <div class="flex items-center time-tracker-day-options">
       <q-btn
-        v-if="canMergeUpwards"
+        v-if="canMergeUpwards && $q.screen.gt.md"
         icon="fas fa-arrow-up"
         size="sm"
         round
@@ -149,8 +149,9 @@
       >
         <q-tooltip>{{ $t('table.actions.merge_up') }}</q-tooltip>
       </q-btn>
+
       <q-btn
-        v-if="canMergeDownwards"
+        v-if="canMergeDownwards && $q.screen.gt.md"
         icon="fas fa-arrow-down"
         size="sm"
         round
@@ -159,11 +160,16 @@
         <q-tooltip>{{ $t('table.actions.merge_down') }}</q-tooltip>
       </q-btn>
 
-      <template v-if="!editMode && jiraStore.isConfigured && !entry.pushedToJira && $q.screen.gt.md && entry.end">
+      <template
+        v-if="!editMode && $q.screen.gt.md && entry.type === TimeTrackerEntryType.Work &&
+          !entry.pushedToJira&& entry.end && jiraStore.isConfigured"
+      >
         <q-btn
           icon="fab fa-jira"
+          color="blue"
           size="sm"
           round
+          flat
           @click="pushToJira"
         >
           <q-tooltip>{{ $t('push_to_jira.title') }}</q-tooltip>
@@ -177,6 +183,46 @@
       >
         <q-menu>
           <q-list>
+            <template v-if="!$q.screen.gt.md">
+              <q-item v-close-popup clickable @click="pushToJira">
+                <q-item-section side>
+                  <q-item-label>
+                    <q-icon name="fab fa-jira" color="blue" />
+                  </q-item-label>
+                </q-item-section>
+                <q-item-section>
+                  <q-item-label>
+                    {{ $t('push_to_jira.title') }}
+                  </q-item-label>
+                </q-item-section>
+              </q-item>
+              <q-separator />
+              <q-item v-if="canMergeUpwards" v-close-popup clickable @click="$emit('merge', 'up')">
+                <q-item-section side>
+                  <q-item-label>
+                    <q-icon name="fas fa-arrow-up" />
+                  </q-item-label>
+                </q-item-section>
+                <q-item-section>
+                  <q-item-label>
+                    {{ $t('table.actions.merge_up') }}
+                  </q-item-label>
+                </q-item-section>
+              </q-item>
+              <q-item v-if="canMergeDownwards" v-close-popup clickable @click="$emit('merge', 'down')">
+                <q-item-section side>
+                  <q-item-label>
+                    <q-icon name="fas fa-arrow-down" />
+                  </q-item-label>
+                </q-item-section>
+                <q-item-section>
+                  <q-item-label>
+                    {{ $t('table.actions.merge_down') }}
+                  </q-item-label>
+                </q-item-section>
+              </q-item>
+              <q-separator />
+            </template>
             <q-item v-close-popup clickable @click="toggleEntryType">
               <q-item-section side>
                 <q-item-label>
