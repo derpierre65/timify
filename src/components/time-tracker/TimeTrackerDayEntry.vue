@@ -22,7 +22,7 @@
     </div>
 
     <div class="tw:w-12">
-      <template v-if="editMode && editEntry">
+      <template v-if="editMode && editEntry && editEntry.end">
         <TimeTrackerTimeInput
           v-model="editEntry.end"
           :label="$t('table.end')"
@@ -242,7 +242,7 @@
             <q-item v-close-popup clickable @click="deleteEntry">
               <q-item-section side>
                 <q-item-label>
-                  <q-icon name="fas fa-trash tw:text-red-400" />
+                  <q-icon name="fas fa-trash" color="negative" />
                 </q-item-label>
               </q-item-section>
               <q-item-section>
