@@ -1,6 +1,14 @@
 @import 'tailwindcss' prefix(tw) source('../');
 
+@theme {
+  --color-primary: #1976D2;
+}
+
 @import 'intro.js/introjs.css';
+
+.fas, .fab {
+  @apply tw:text-base!;
+}
 
 .introjs-tooltip {
   @apply tw:bg-neutral-800;
