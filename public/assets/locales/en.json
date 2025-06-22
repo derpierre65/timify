@@ -4,7 +4,8 @@
     "save": "Save",
     "cancel": "Cancel",
     "close": "Close",
-    "confirm": "Confirm"
+    "confirm": "Confirm",
+    "update_available": "A new version is available."
   },
   "error": {
     "unknown": "Unknown error.",

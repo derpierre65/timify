@@ -2,6 +2,7 @@
 // https://v2.quasar.dev/quasar-cli-vite/quasar-config-file
 
 import { defineConfig } from '#q-app/wrappers';
+import generateFile from 'vite-plugin-generate-file';
 
 process.env.VITE_BUILD_TIMESTAMP = Date.now().toString();
 process.env.VITE_BUILD_VERSION = process.env.npm_package_version;
@@ -72,9 +73,18 @@ export default defineConfig((/* ctx */) => {
       // extendViteConf (viteConf) {},
       // viteVuePluginOptions: {},
 
-      // vitePlugins: [
-      //   [ 'package-name', { ..pluginOptions.. }, { server: true, client: true } ]
-      // ]
+      vitePlugins: [
+        generateFile([
+          {
+            type: 'json',
+            output: './assets/version.json',
+            data: {
+              version: process.env.npm_package_version,
+              date: parseInt(process.env.VITE_BUILD_TIMESTAMP),
+            },
+          },
+        ]),
+      ],
     },
 
     // Full list of options: https://v2.quasar.dev/quasar-cli-vite/quasar-config-file#devserver
