@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-wrap items-center tw:gap-4 tw:min-h-11 tw:hover:bg-neutral-800 q-px-sm">
+  <div class="flex flex-wrap items-center tw:gap-4 tw:min-h-12 tw:hover:bg-neutral-800 q-px-sm">
     <i class="fas flex" :class="entry.type === TimeTrackerEntryType.Work ? 'fa-desktop tw:text-neutral-500' : 'fa-coffee tw:text-green-600'">
       <q-tooltip>{{ $t(`entry_type.${entry.type}`) }}</q-tooltip>
     </i>
@@ -72,7 +72,7 @@
       </template>
       <template v-else>
         <span class="tw:text-xs">{{ $t('table.project') }}</span>
-        <div class="full-width">
+        <div class="full-width flex items-center">
           <q-badge
             v-if="project"
             class="overflow-hidden ellipsis tw:max-w-[100%] inline-block"
