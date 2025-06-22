@@ -16,16 +16,26 @@
 </template>
 
 <script lang="ts" setup>
-import { nextTick, onMounted, ref } from 'vue';
+import {
+  inject,
+  nextTick,
+  onMounted,
+  Ref,
+  ref,
+  watchEffect,
+} from 'vue';
 import { getWeekStartEnd } from 'src/lib/date';
 import TimeTrackerWeek from 'components/time-tracker/TimeTrackerWeek.vue';
 import { uid } from 'quasar';
 import { getEntryTourSteps, shouldShowEntryTour, startTour } from 'src/lib/tour';
 import { useTranslation } from 'i18next-vue';
 import { useSettingsStore } from 'stores/settings';
+import { currentDateInjectionKey } from 'src/lib/keys';
 
 const settingsStore = useSettingsStore();
 const { t, } = useTranslation();
+
+const currentDate = inject<Ref<Date>>(currentDateInjectionKey)!;
 
 const weeks = ref<Array<{
   uid: string;
@@ -83,5 +93,18 @@ onMounted(async() => {
       ],
     ],
   });
+});
+
+watchEffect(() => {
+  if (!weeks.value[0]) {
+    return;
+  }
+
+  if (currentDate.value > weeks.value[0].end) {
+    weeks.value.unshift({
+      uid: uid(),
+      ...getWeekStartEnd(new Date()),
+    });
+  }
 });
 </script>
