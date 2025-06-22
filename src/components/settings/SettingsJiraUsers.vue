@@ -73,8 +73,6 @@
           />
         </template>
 
-        <pre>{{ instance }}</pre>
-
         <q-input
           v-model="instance.name"
           :label="$t('settings.jira_instances.name')"
@@ -104,10 +102,24 @@
               :label="$t('settings.jira_instances.test_connection')"
               color="primary"
               no-caps
-              @click="testConnection(instance)"
+              @click="testConnection(instance, false)"
             >
               <q-tooltip v-if="!(instance.userId && instance.cloudId)">
                 {{ $t('settings.jira_instances.test_connection_disabled') }}
+              </q-tooltip>
+            </q-btn>
+            <q-btn
+              :disable="!(instance.userId && instance.cloudId)"
+              :label="$t('settings.jira_instances.add_projects')"
+              color="positive"
+              no-caps
+              @click="testConnection(instance)"
+            >
+              <q-tooltip>
+                <span v-if="instance.userId && instance.cloudId">
+                  {{ $t('settings.jira_instances.add_projects_tooltip') }}
+                </span>
+                <span v-else>{{ $t('settings.jira_instances.add_projects_disabled') }}</span>
               </q-tooltip>
             </q-btn>
           </template>
@@ -120,11 +132,12 @@
 <script setup lang="ts">
 import AppCard from 'components/AppCard.vue';
 import { JiraInstance, useJiraStore } from 'stores/jira';
-import { Loading, uid } from 'quasar';
+import { Dialog, Loading, uid } from 'quasar';
 import { computed } from 'vue';
 import { jiraRequest } from 'src/lib/jira';
 import { useTranslation } from 'i18next-vue';
 import { showErrorMessage, showSuccessMessage } from 'src/lib/ui';
+import DialogJiraProjectAdd from 'components/jira/DialogJiraProjectAdd.vue';
 
 const { t, } = useTranslation();
 const jiraStore = useJiraStore();
@@ -154,6 +167,10 @@ function addUser() {
     username: '',
   });
 }
+
+function removeUser(index: number) {
+  jiraStore.jiraUsers.splice(index, 1);
+}
 function addInstance() {
   jiraStore.jiraInstances.push({
     uid: uid(),
@@ -163,14 +180,11 @@ function addInstance() {
   });
 }
 
-function removeUser(index: number) {
-  jiraStore.jiraUsers.splice(index, 1);
-}
 function removeInstance(index: number) {
   jiraStore.jiraInstances.splice(index, 1);
 }
 
-function testConnection(instance: JiraInstance) {
+function testConnection(instance: JiraInstance, showDialog = true) {
   Loading.show({
     message: t('settings.jira_instances.test_connection_progress'),
     group: 'testConnection',
@@ -185,12 +199,24 @@ function testConnection(instance: JiraInstance) {
       showSuccessMessage(t('settings.jira_instances.test_connection_success', {
         count: data.total,
       }));
+
+      if (data.total && showDialog) {
+        showAddProjectDialog(data);
+      }
     })
     .catch(() => {
-      // improve errorhandling?
+      // improve error handling?
       showErrorMessage(t('settings.jira_instances.test_connection_failed'));
     })
     .finally(() => Loading.hide('testConnection'));
 }
 
+function showAddProjectDialog(data: object) {
+  Dialog.create({
+    component: DialogJiraProjectAdd,
+    componentProps: {
+      projects: data.values,
+    },
+  });
+}
 </script>

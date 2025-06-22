@@ -83,7 +83,12 @@
       "test_connection_progress": "Testing Connection...",
       "test_connection_success_one": "Connection tested successfully. {{count}} project found.",
       "test_connection_success_other": "Connection tested successfully. {{count}} projects found.",
-      "test_connection_failed": "Test connection failed."
+      "test_connection_failed": "Test connection failed.",
+      "add_projects": "Add Projects",
+      "add_projects_disabled": "Jira User and Cloud ID are required to add projects.",
+      "add_projects_tooltip": "Add all Jira Projects as Timify Project.",
+      "add_projects_name_exists": "A project with this name already exists.",
+      "add_projects_name": "Project Name"
     }
   },
   "tour": {
