@@ -65,11 +65,25 @@
       "jira_users": "Jira Users"
     },
     "jira_users": {
+      "title": "Users",
       "no_username": "E-Mail not set",
       "username": "E-Mail",
       "token": "API Token",
       "token_hint": "Get your API token {here}.",
       "token_hint_here": "here"
+    },
+    "jira_instances": {
+      "title": "Jira Instances",
+      "no_name": "Name not set",
+      "name": "Name",
+      "cloud_id": "Cloud ID",
+      "user": "Jira User",
+      "test_connection": "Test connection",
+      "test_connection_disabled": "Jira User and Cloud ID are required to test the connection.",
+      "test_connection_progress": "Testing Connection...",
+      "test_connection_success_one": "Connection tested successfully. {{count}} project found.",
+      "test_connection_success_other": "Connection tested successfully. {{count}} projects found.",
+      "test_connection_failed": "Test connection failed."
     }
   },
   "tour": {
