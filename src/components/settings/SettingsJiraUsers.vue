@@ -2,7 +2,7 @@
   <div class="q-gutter-y-md">
     <AppCard :title="$t('settings.jira_users.title')" section-class="q-gutter-y-sm">
       <template v-if="canCreateNewUser" #buttons>
-        <q-btn icon="fas fa-plus" color="primary" @click="addUser" />
+        <q-btn icon="fas fa-plus tw:text-base!" color="primary" @click="addUser" />
       </template>
 
       <AppCard
@@ -16,7 +16,7 @@
         </template>
         <template #buttons>
           <q-btn
-            icon="fas fa-trash"
+            icon="fas fa-trash tw:text-base!"
             color="negative"
             @click="removeUser(index)"
           />
@@ -53,7 +53,7 @@
 
     <AppCard :title="$t('settings.jira_instances.title')" section-class="q-gutter-y-md">
       <template v-if="canCreateNewInstance" #buttons>
-        <q-btn icon="fas fa-plus" color="primary" @click="addInstance" />
+        <q-btn icon="fas fa-plus tw:text-base!" color="primary" @click="addInstance" />
       </template>
 
       <AppCard
@@ -67,7 +67,7 @@
         </template>
         <template #buttons>
           <q-btn
-            icon="fas fa-trash"
+            icon="fas fa-trash tw:text-base!"
             color="negative"
             @click="removeInstance(index)"
           />
