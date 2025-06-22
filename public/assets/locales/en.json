@@ -55,6 +55,23 @@
     "current_difference": "Current difference",
     "merged": "Entries have been merged."
   },
+  "push_to_jira": {
+    "title": "Push to Jira",
+    "instance": "Jira Instance",
+    "issue_id": "Issue ID",
+    "comment": "Comment",
+    "use_single_comment": "Use one comment for all issues",
+    "comment_all_issues": "Comment for all issues",
+    "push_confirm": "There are invalid entries that will be ignored when submitting to Jira. Would you like to continue?",
+    "success": "Your time entries have been pushed to Jira.",
+    "errors": {
+      "no_instance": "No Jira instance selected.",
+      "no_issue_id": "No Issue ID selected.",
+      "no_start": "No start selected.",
+      "no_end": "No end selected.",
+      "minimum_duration": "Total time must be at least 1 minute."
+    }
+  },
   "actions": {
     "start_work": "Start work",
     "start_break": "Start break",

@@ -159,6 +159,17 @@
         <q-tooltip>{{ $t('table.actions.merge_down') }}</q-tooltip>
       </q-btn>
 
+      <template v-if="!editMode && jiraStore.isConfigured && !entry.pushedToJira && $q.screen.gt.md && entry.end">
+        <q-btn
+          icon="fab fa-jira"
+          size="sm"
+          round
+          @click="pushToJira"
+        >
+          <q-tooltip>{{ $t('push_to_jira.title') }}</q-tooltip>
+        </q-btn>
+      </template>
+
       <q-btn
         icon="fas fa-ellipsis-h"
         size="sm"
@@ -203,7 +214,7 @@
 <script setup lang="ts">
 import { TimeTrackerEntry, TimeTrackerEntryType } from 'stores/timeTracker';
 import { computed, inject, ref, Ref } from 'vue';
-import { date, Loading } from 'quasar';
+import { date, Dialog, Loading } from 'quasar';
 import { formatHourAndMinutes } from 'src/lib/date';
 import { currentDateInjectionKey } from 'src/lib/keys';
 import EntryResource from 'src/lib/resources/EntryResource';
@@ -214,6 +225,8 @@ import { useTranslation } from 'i18next-vue';
 import { useProjectStore } from 'stores/project';
 import ProjectResource from 'src/lib/resources/ProjectResource';
 import { getAccessibleTextColor } from 'src/lib/color';
+import { useJiraStore } from 'stores/jira';
+import TimeTrackerDialogPushJira from 'components/time-tracker/TimeTrackerDialogPushJira.vue';
 
 const props = defineProps<{
   entry: TimeTrackerEntry;
@@ -227,6 +240,7 @@ const emit = defineEmits<{
 }>();
 
 const projectStore = useProjectStore();
+const jiraStore = useJiraStore();
 const { t, } = useTranslation();
 const currentDate = inject<Ref<Date>>(currentDateInjectionKey)!;
 
@@ -357,6 +371,19 @@ function addProject(value: string, done) {
       done(data);
     })
     .catch(catchError);
+}
+
+function pushToJira() {
+  Dialog.create({
+    component: TimeTrackerDialogPushJira,
+    componentProps: {
+      entry: props.entry,
+    },
+  }).onOk(() => {
+    EntryResource.instance.update(props.entry.uid, {
+      pushedToJira: true,
+    });
+  });
 }
 
 if (!props.entry.uid) {
