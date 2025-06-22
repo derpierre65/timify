@@ -1,6 +1,6 @@
 <template>
   <div class="flex column tw:flex-auto">
-    <div class="tw:text-center q-gutter-y-md">
+    <div class="tw:text-center q-gutter-y-md q-pt-md">
       <!-- timer -->
       <div id="index-timer">
         <span class="tw:text-4xl tw:text-neutral-300">{{ currentTimer.hours }}</span>
@@ -58,6 +58,7 @@
           flex justify-center items-center rounded-borders cursor-pointer"
       >
         <i class="fas fa-cog" />
+        <q-tooltip>{{ $t('pages.settings') }}</q-tooltip>
       </router-link>
     </div>
   </div>

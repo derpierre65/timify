@@ -23,7 +23,7 @@
         <div>
           This is an <a
             href="https://github.com/derpierre65/timify"
-            class="tw:text-blue-400 tw:hover:text-blue-300"
+            class="link"
             target="_blank"
             rel="noopener noreferrer"
           >Open Source</a> Project
@@ -34,7 +34,7 @@
             href="https://www.derpierre65.dev/"
             target="_blank"
             rel="noopener noreferrer"
-            class="tw:text-blue-400 tw:hover:text-blue-300"
+            class="link"
           >derpierre65</a> with </span>
           <q-icon name="fa fa-heart" color="red" />
           <span> in Ireland</span>

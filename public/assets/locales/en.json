@@ -10,6 +10,10 @@
     "unknown": "Unknown error.",
     "start_must_before_end": "Start must be before End."
   },
+  "pages": {
+    "home": "Home",
+    "settings": "Settings"
+  },
   "days": [
     "Sunday",
     "Monday",
@@ -55,6 +59,18 @@
     "start_work": "Start work",
     "start_break": "Start break",
     "stop_work": "Stop work"
+  },
+  "settings": {
+    "tabs": {
+      "jira_users": "Jira Users"
+    },
+    "jira_users": {
+      "no_username": "E-Mail not set",
+      "username": "E-Mail",
+      "token": "API Token",
+      "token_hint": "Get your API token {here}.",
+      "token_hint_here": "here"
+    }
   },
   "tour": {
     "confirm_exit": "Do you really want to cancel the tour? You can restart the tour at any time from the settings.",
