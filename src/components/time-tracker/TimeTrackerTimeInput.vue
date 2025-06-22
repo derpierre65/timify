@@ -3,11 +3,15 @@
     :model-value="currentValue"
     type="text"
     @change="onUpdate"
-  />
+  >
+    <template v-for="(_, slot) in $slots" :key="slot" #[slot]="scope">
+      <slot :name="slot" v-bind="scope || {}" />
+    </template>
+  </q-input>
 </template>
 
 <script setup lang="ts">
-import { computed, watchEffect } from 'vue';
+import { computed } from 'vue';
 import { date } from 'quasar';
 
 const modelValue = defineModel<Date>({
@@ -161,8 +165,11 @@ function onUpdate(newValue: string) {
   modelValue.value = newDate;
 }
 
-watchEffect(() => {
-  console.log('test:', date.formatDate(modelValue.value, 'DD.MM.YYYY HH:mm'));
-});
+function addValue(value: string) {
+  onUpdate(`${currentValue.value}${value}`);
+}
 
+defineExpose({
+  addValue,
+});
 </script>

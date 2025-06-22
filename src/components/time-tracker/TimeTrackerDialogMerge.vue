@@ -37,19 +37,49 @@
           <TimeTrackerDialogMergeEntryBox :start="newStart" :end="newEnd">
             <template #start>
               <TimeTrackerTimeInput
+                ref="inputStart"
                 v-model="newStart"
                 :label="$t('table.start')"
                 :error="!isValidStart"
                 hide-bottom-space
                 dense
-              />
+              >
+                <template #after>
+                  <q-btn
+                    v-if="showWarning"
+                    icon="fas fa-wand-magic-sparkles"
+                    color="purple"
+                    size="sm"
+                    round
+                    flat
+                    @click="adjustTime('start')"
+                  >
+                    <q-tooltip>{{ $t('merge.adjust_time') }}</q-tooltip>
+                  </q-btn>
+                </template>
+              </TimeTrackerTimeInput>
             </template>
             <template #end>
               <TimeTrackerTimeInput
+                ref="inputEnd"
                 v-model="newEnd"
                 :label="$t('table.end')"
                 dense
-              />
+              >
+                <template #after>
+                  <q-btn
+                    v-if="showWarning"
+                    icon="fas fa-wand-magic-sparkles"
+                    color="purple"
+                    size="sm"
+                    round
+                    flat
+                    @click="adjustTime('end')"
+                  >
+                    <q-tooltip>{{ $t('merge.adjust_time') }}</q-tooltip>
+                  </q-btn>
+                </template>
+              </TimeTrackerTimeInput>
             </template>
 
             <div class="flex column tw:w-26">
@@ -81,7 +111,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, provide, ref } from 'vue';
+import { computed, provide, ref, useTemplateRef } from 'vue';
 import { useDialogPluginComponent, useInterval } from 'quasar';
 import { formatHourAndMinutes } from 'src/lib/date';
 import TimeTrackerDialogMergeEntryBox from 'components/time-tracker/TimeTrackerDialogMergeEntryBox.vue';
@@ -102,6 +132,9 @@ const {
   onDialogCancel,
   onDialogOK,
 } = useDialogPluginComponent();
+const inputStart = useTemplateRef('inputStart');
+const inputEnd = useTemplateRef('inputEnd');
+
 useInterval().registerInterval(() => {
   currentDate.value = new Date();
 }, 997);
@@ -134,6 +167,20 @@ const isValidStart = computed(() => {
 const canBeSaved = computed(() => {
   return isValidStart.value;
 });
+
+function adjustTime(field: 'start' | 'end') {
+  let addValue = formattedAdditionalTime.value;
+  if (!addValue.startsWith('-')) {
+    addValue = `+${addValue}`;
+  }
+
+  if (field === 'start') {
+    inputStart.value?.addValue(addValue);
+    return;
+  }
+
+  inputEnd.value?.addValue(`${addValue.startsWith('+') ? '-' : '+'}${addValue.substring(1)}`);
+}
 
 function confirm() {
   onDialogOK({

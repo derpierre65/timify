@@ -1,12 +1,12 @@
 <template>
   <div class="flex tw:gap-4">
-    <div class="flex column tw:w-20">
+    <div class="flex column tw:w-24">
       <slot name="start">
         <span class="tw:text-xs">{{ $t('table.start') }}</span>
         <span>{{ date.formatDate(start, 'HH:mm') }}</span>
       </slot>
     </div>
-    <div class="flex column tw:w-20">
+    <div class="flex column tw:w-24">
       <slot v-if="end" name="end">
         <span class="tw:text-xs">{{ $t('table.end') }}</span>
         <span v-if="end" class="tw:flex-auto flex column justify-center">{{ date.formatDate(end, 'HH:mm') }}</span>
