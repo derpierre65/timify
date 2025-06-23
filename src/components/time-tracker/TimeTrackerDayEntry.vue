@@ -15,7 +15,12 @@
           @keyup.esc="cancelEdit"
         />
       </template>
-      <div v-else class="flex column" @click="startEditMode('start')">
+      <div
+        v-else
+        :class="{'cursor-pointer': !editMode}"
+        class="flex column"
+        @click="startEditMode('start')"
+      >
         <span class="tw:text-xs">{{ $t('table.start') }}</span>
         <span>{{ startTime }}</span>
       </div>
@@ -32,7 +37,12 @@
           @keyup.esc="cancelEdit"
         />
       </template>
-      <div v-else class="flex column" @click="startEditMode('end')">
+      <div
+        v-else
+        :class="{'cursor-pointer': !editMode}"
+        class="flex column"
+        @click="startEditMode('end')"
+      >
         <span class="tw:text-xs">{{ $t('table.end') }}</span>
         <template v-if="endTime">
           <span>{{ endTime }}</span>
