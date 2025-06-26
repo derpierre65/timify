@@ -105,7 +105,7 @@
                   v-if="!useSingleComment"
                   v-model="pushEntry.comment"
                   :disable="pushEntry.sent || pushEntry.loading"
-                  class="tw:col-span-7"
+                  class="tw:md:col-span-8"
                   :label="$t('push_to_jira.comment')"
                   type="textarea"
                   autogrow
@@ -139,20 +139,19 @@
               </q-item-section>
             </q-item>
           </q-list>
-          <div class="flex justify-between">
+          <div class="flex flex-center">
             <q-btn color="primary" icon="fas fa-plus" @click="addJiraIssue()" />
-
-            <q-btn
-              :label="$t('push_to_jira.split_time')"
-              color="primary"
-              no-caps
-              @click="splitTotalBetweenIssues"
-            />
           </div>
         </q-card-section>
       </div>
 
       <q-card-actions class="tw:bg-neutral-950" align="right">
+        <q-btn
+          :label="$t('push_to_jira.split_time')"
+          color="primary"
+          no-caps
+          @click="splitTotalBetweenIssues"
+        />
         <q-btn
           :label="$t('push_to_jira.title')"
           :disable="!canPush"
@@ -245,14 +244,14 @@ const autoDetectedJiraInstance = computed(() => {
   return null;
 });
 
-function addJiraIssue(cloudId: string | null = '', issueId = '') {
+function addJiraIssue(cloudId: string | null = '', issueId = '', comment = '') {
   pushToInstances.value.push({
+    issueId,
+    comment,
     uid: uid(),
-    comment: '',
     start: new Date(props.entry.start),
     end: new Date(props.entry.end!),
     cloudId: cloudId || autoDetectedJiraInstance.value?.cloudId || null,
-    issueId,
     loading: false,
     invalid: false,
     sent: false,
@@ -418,14 +417,29 @@ function adjustStart(entry: typeof pushToInstances.value[0]) {
   const foundIssueIds: Array<{
     id: string;
     projectName: string;
+    comment: string;
   }> = [];
+
+  const comment = [];
   for (const possibleEntryId of possibleEntryIds) {
+    let finalText = possibleEntryId;
+    const found = [];
     for (const match of possibleEntryId.matchAll(/([A-Z]+)-(\d+)/g)) {
-      foundIssueIds.push({
+      found.push({
         id: match[0],
         projectName: match[1]!,
+        comment: '',
       });
+      finalText = finalText.replace(match[0], '').trim();
     }
+
+    if (finalText.length) {
+      for (const entry of found) {
+        entry.comment = finalText;
+      }
+      useSingleComment.value = false;
+    }
+    foundIssueIds.push(...found);
   }
 
   const potentialInstances = Object.create(null);
@@ -442,7 +456,7 @@ function adjustStart(entry: typeof pushToInstances.value[0]) {
 
   for (const foundIssue of foundIssueIds) {
     const cloudId = autoDetectedJiraInstance.value?.cloudId || potentialInstances[foundIssue.projectName] || null;
-    addJiraIssue(cloudId, foundIssue.id);
+    addJiraIssue(cloudId, foundIssue.id, foundIssue.comment);
   }
 
   if (!pushToInstances.value.length) {
