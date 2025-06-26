@@ -139,7 +139,16 @@
               </q-item-section>
             </q-item>
           </q-list>
-          <q-btn color="primary" icon="fas fa-plus" @click="addJiraIssue()" />
+          <div class="flex justify-between">
+            <q-btn color="primary" icon="fas fa-plus" @click="addJiraIssue()" />
+
+            <q-btn
+              :label="$t('push_to_jira.split_time')"
+              color="primary"
+              no-caps
+              @click="splitTotalBetweenIssues"
+            />
+          </div>
         </q-card-section>
       </div>
 
@@ -250,6 +259,15 @@ function addJiraIssue(cloudId: string | null = '', issueId = '') {
     error: false,
   });
   validateEntry(pushToInstances.value[pushToInstances.value.length - 1]!);
+}
+
+function splitTotalBetweenIssues() {
+  const totalTime = props.entry.end!.getTime() - props.entry.start.getTime();
+  const timePerIssue = Math.max(Math.ceil(totalTime / pushToInstances.value.length), 60_000);
+  for (const entry of pushToInstances.value) {
+    entry.start = new Date(props.entry.start);
+    entry.end = new Date(props.entry.start.getTime() + timePerIssue);
+  }
 }
 
 function validateEntry(entry: typeof pushToInstances.value[0]) {
