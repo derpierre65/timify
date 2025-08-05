@@ -12,9 +12,11 @@
 
     <q-page-container>
       <q-page class="flex flex-col">
-        <keep-alive include="IndexPage">
-          <router-view />
-        </keep-alive>
+        <router-view v-slot="{ Component }">
+          <keep-alive include="IndexPage">
+            <component :is="Component" />
+          </keep-alive>
+        </router-view>
       </q-page>
     </q-page-container>
 
