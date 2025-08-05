@@ -70,7 +70,7 @@
     "split_time": "Share total time between all issues",
     "errors": {
       "no_instance": "No Jira instance selected.",
-      "no_issue_id": "No Issue ID selected.",
+      "no_issue_id": "No Issue ID filled in.",
       "no_start": "No start selected.",
       "no_end": "No end selected.",
       "minimum_duration": "Total time must be at least 1 minute."

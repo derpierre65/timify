@@ -48,12 +48,7 @@ const useTimeTrackerStore = defineStore('timeTracker', () => {
     return grouped;
   });
   const currentEntry = computed(() => {
-    const currentEntry = entries.value[entries.value.length - 1];
-    if (!currentEntry || currentEntry.end) {
-      return null;
-    }
-
-    return entries.value[entries.value.length - 1];
+    return entries.value.find((entry) => !entry.end);
   });
   const currentStatus = computed(() => {
     if (!currentEntry.value) {
