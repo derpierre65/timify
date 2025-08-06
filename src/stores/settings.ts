@@ -14,12 +14,14 @@ const useSettingsStore = defineStore('settings', () => {
   const hideFooter = ref(false);
   const defaultProjectId = ref<string | null>(null);
   const defaultProjectCode = ref<string>('');
+  const activityWarning = ref(10);
 
   function finishTour(tour: string) {
     finishedTours.value.push(tour);
   }
 
   return {
+    activityWarning,
     dateFormat,
     timeFormat,
     firstWeekDay,

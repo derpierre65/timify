@@ -61,17 +61,43 @@
 <script lang="ts" setup>
 import { useSettingsStore } from 'stores/settings';
 import AppSidebar from 'components/AppSidebar.vue';
-import { ref } from 'vue';
-import { useInterval } from 'quasar';
+import { onMounted, ref } from 'vue';
+import { Dialog, useInterval } from 'quasar';
 import axios from 'axios';
+import { useTimeTrackerStore } from 'stores/timeTracker';
+import TimeTrackerDialogActivityDiff from 'components/time-tracker/TimeTrackerDialogActivityDiff.vue';
 
 const settingsStore = useSettingsStore();
+const timeTrackerStore = useTimeTrackerStore();
 
 const updateAvailable = ref(false);
 
 function refreshApplication() {
   window.location.reload();
 }
+
+onMounted(() => {
+  if (!timeTrackerStore.currentEntry || !timeTrackerStore.lastActivity) {
+    return;
+  }
+
+  const lastActivity = new Date(timeTrackerStore.lastActivity);
+  if (lastActivity < timeTrackerStore.currentEntry.start) {
+    return;
+  }
+
+  const lastActivityDiff = (new Date() - lastActivity) / 1_000;
+  if (lastActivityDiff < settingsStore.activityWarning * 60) {
+    return;
+  }
+
+  Dialog.create({
+    component: TimeTrackerDialogActivityDiff,
+    componentProps: {
+      persistent: true,
+    },
+  });
+});
 
 if (!import.meta.env.DEV) {
   useInterval().registerInterval(() => {

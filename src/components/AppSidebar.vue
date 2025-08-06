@@ -78,15 +78,14 @@
 </template>
 
 <script setup lang="ts">
-import { TimeTrackerEntry, TimeTrackerEntryType, TimeTrackerStatus, useTimeTrackerStore } from 'stores/timeTracker';
-import { date } from 'quasar';
-import EntryResource from 'src/lib/resources/EntryResource';
+import { TimeTrackerStatus, useTimeTrackerStore } from 'stores/timeTracker';
 import { computed, inject, nextTick, Ref } from 'vue';
 import { getEntryTourSteps, startTour } from 'src/lib/tour';
 import { parseSeconds } from 'src/lib/date';
 import { currentDateInjectionKey } from 'src/lib/keys';
 import { useSettingsStore } from 'stores/settings';
 import ProjectSelect from 'components/ProjectSelect.vue';
+import { triggerAction as _triggerAction } from 'src/lib/time-tracker';
 
 const timeTrackerStore = useTimeTrackerStore();
 const settingsStore = useSettingsStore();
@@ -104,55 +103,7 @@ const currentTimer = computed(() => {
 async function triggerAction(status: TimeTrackerStatus) {
   currentDate.value = new Date();
 
-  const defaultFields: Partial<TimeTrackerEntry> = {};
-
-  if (settingsStore.defaultProjectId) {
-    defaultFields.project = settingsStore.defaultProjectId;
-  }
-  if (settingsStore.defaultProjectCode) {
-    defaultFields.project_code = settingsStore.defaultProjectCode;
-  }
-
-  if (timeTrackerStore.currentEntry) {
-    const endOfDate = date.endOfDate(timeTrackerStore.currentEntry.start, 'day');
-    if (currentDate.value > endOfDate) {
-      const finalEnd = new Date();
-      const currentStart = new Date(timeTrackerStore.currentEntry.start);
-      const type = timeTrackerStore.currentEntry.type;
-
-      while (currentStart < finalEnd) {
-        const currentEnd = date.endOfDate(new Date(currentStart), 'day');
-
-        // If currentEnd would exceed the final end time, use final end time instead
-        const endTime = currentEnd > finalEnd ? finalEnd : currentEnd;
-
-        if (timeTrackerStore.currentEntry && timeTrackerStore.currentEntry.start.getTime() === currentStart.getTime()) {
-          timeTrackerStore.currentEntry.end = new Date(endTime);
-        }
-        else {
-          await EntryResource.instance.store({
-            start: new Date(currentStart),
-            end: new Date(endTime),
-            type,
-            ...defaultFields,
-          });
-        }
-
-        currentStart.setTime(currentEnd.getTime() + 1);
-      }
-    }
-    else {
-      timeTrackerStore.currentEntry.end = currentDate.value;
-    }
-  }
-
-  if (status !== TimeTrackerStatus.Stopped) {
-    await EntryResource.instance.store({
-      start: new Date(),
-      type: status === TimeTrackerStatus.Running ? TimeTrackerEntryType.Work : TimeTrackerEntryType.Break,
-      ...defaultFields,
-    });
-  }
+  await _triggerAction(status, currentDate.value);
 
   if (!settingsStore.finishedTours.includes('entry')) {
     await nextTick();

@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { computed, ref } from 'vue';
-import { date } from 'quasar';
+import { date, useInterval } from 'quasar';
 import { StoreApiStoreFunctions } from 'src/lib/resources/interfaces/PiniaStoreApiInterface';
 import { useCrudStore } from 'src/composables/store/crudStore';
 import type { Project } from 'stores/project';
@@ -28,6 +28,8 @@ enum TimeTrackerStatus {
 
 const useTimeTrackerStore = defineStore('timeTracker', () => {
   const entries = ref<TimeTrackerEntry[]>([]);
+  const lastActivity = ref<Date | null>(null);
+  const askLastActivity = ref(false);
   const crudFunctions = useCrudStore(entries);
 
   const groupedEntries = computed(() => {
@@ -58,11 +60,21 @@ const useTimeTrackerStore = defineStore('timeTracker', () => {
     return currentEntry.value.type === TimeTrackerEntryType.Work ? TimeTrackerStatus.Running : TimeTrackerStatus.Paused;
   });
 
+  useInterval().registerInterval(() => {
+    if (askLastActivity.value) {
+      return;
+    }
+
+    lastActivity.value = new Date();
+  }, 10_000);
+
   return {
     entries,
     groupedEntries,
     currentEntry,
     currentStatus,
+    lastActivity,
+    askLastActivity,
     ...crudFunctions,
   } satisfies StoreApiStoreFunctions<TimeTrackerEntry> & Record<string, unknown>;
 }, {
@@ -73,6 +85,8 @@ const useTimeTrackerStore = defineStore('timeTracker', () => {
       },
       deserialize(state) {
         const deserialized = JSON.parse(state);
+
+        deserialized.lastActivity = deserialized.lastActivity ? new Date(deserialized.lastActivity) : null;
 
         deserialized.entries.map((entry: TimeTrackerEntry) => {
           entry.start = new Date(entry.start);

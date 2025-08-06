@@ -57,6 +57,13 @@
     "merged": "Entries have been merged.",
     "adjust_time": "Add/Remove difference"
   },
+  "break_detected": {
+    "title": "Break detected",
+    "line1": "Your last activity was detected on {date}.",
+    "line2": "The timer has not been stopped since then. Would you like to set the end of the last started time to the moment of your last activity?",
+    "button_ignore": "Ignore",
+    "button_apply": "Apply"
+  },
   "push_to_jira": {
     "title": "Push to Jira",
     "instance": "Jira Instance",
