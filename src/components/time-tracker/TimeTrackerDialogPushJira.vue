@@ -411,8 +411,8 @@ function adjustStart(entry: typeof pushToInstances.value[0]) {
   validateEntry(entry);
 }
 
-(() => {
-  const possibleEntryIds = props.entry.project_code.split(',').map((code) => code.trim()).filter((code) => code);
+function autofill(entry: TimeTrackerEntry) {
+  const possibleEntryIds = entry.project_code.split(',').map((code) => code.trim()).filter((code) => code);
 
   const foundIssueIds: Array<{
     id: string;
@@ -420,7 +420,6 @@ function adjustStart(entry: typeof pushToInstances.value[0]) {
     comment: string;
   }> = [];
 
-  const comment = [];
   for (const possibleEntryId of possibleEntryIds) {
     let finalText = possibleEntryId;
     const found = [];
@@ -462,5 +461,7 @@ function adjustStart(entry: typeof pushToInstances.value[0]) {
   if (!pushToInstances.value.length) {
     addJiraIssue();
   }
-})();
+}
+
+autofill(props.entry);
 </script>

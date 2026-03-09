@@ -88,6 +88,20 @@
     "start_break": "Start break",
     "stop_work": "Stop work"
   },
+  "export": {
+    "button": "Export",
+    "fields": {
+      "id": "Internal ID"
+    },
+    "settings": {
+      "title": "Export Settings",
+      "ignore_breaks": "Exclude Breaks",
+      "date_format": "Date Format"
+    },
+    "csv": {
+      "fields": "CSV Fields"
+    }
+  },
   "settings": {
     "default_project": "Default Client/Project",
     "default_project_code": "Default Project code",

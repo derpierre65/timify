@@ -65,6 +65,15 @@
     <q-space />
 
     <div class="tw:bg-neutral-800 tw:h-12 flex justify-end items-center tw:border-t tw:border-white/28 q-pa-xs">
+      <div
+        class="tw:hover:text-neutral-100 tw:hover:bg-neutral-900 tw:w-8 tw:h-8
+          flex justify-center items-center rounded-borders cursor-pointer"
+        @click="startExport"
+      >
+        <i class="fas fa-download" />
+        <q-tooltip>{{ $t('export.button') }}</q-tooltip>
+      </div>
+
       <router-link
         :to="{name: 'settings'}"
         class="tw:hover:text-neutral-100 tw:hover:bg-neutral-900 tw:w-8 tw:h-8
@@ -86,6 +95,8 @@ import { currentDateInjectionKey } from 'src/lib/keys';
 import { useSettingsStore } from 'stores/settings';
 import ProjectSelect from 'components/ProjectSelect.vue';
 import { triggerAction as _triggerAction } from 'src/lib/time-tracker';
+import ExportDialogCsv from 'components/export/ExportDialogCsv.vue';
+import { Dialog } from 'quasar';
 
 const timeTrackerStore = useTimeTrackerStore();
 const settingsStore = useSettingsStore();
@@ -99,6 +110,12 @@ const currentTimer = computed(() => {
 
   return parseSeconds((currentDate.value.getTime() - timeTrackerStore.currentEntry.start.getTime()) / 1_000);
 });
+
+function startExport() {
+  Dialog.create({
+    component: ExportDialogCsv,
+  });
+}
 
 async function triggerAction(status: TimeTrackerStatus) {
   currentDate.value = new Date();
