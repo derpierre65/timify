@@ -27,7 +27,24 @@
         >
           <q-tooltip>{{ $t('table.create_entry_break') }}</q-tooltip>
         </q-icon>
+        <q-icon
+          v-if="!dayNote && !creatingNote"
+          name="fas fa-sticky-note"
+          class="cursor-pointer tw:text-amber-500"
+          @click="creatingNote = true"
+        >
+          <q-tooltip>{{ $t('note.create') }}</q-tooltip>
+        </q-icon>
       </div>
+
+      <!-- Day Note -->
+      <TimeTrackerDayNote
+        v-if="dayNote || creatingNote"
+        :note="dayNote"
+        @save="saveNote"
+        @cancel="creatingNote = false"
+        @delete="deleteNote"
+      />
 
       <TimeTrackerDayEntry
         v-if="tempItem"
@@ -65,7 +82,7 @@ import {
   Ref,
   watchEffect,
 } from 'vue';
-import { date, Dialog } from 'quasar';
+import { date, Dialog, Loading } from 'quasar';
 import { getDaysBetween, parseSeconds } from 'src/lib/date';
 import { TimeTrackerEntry, TimeTrackerEntryType, useTimeTrackerStore } from 'stores/timeTracker';
 import { useSettingsStore } from 'stores/settings';
@@ -74,6 +91,9 @@ import { currentDateInjectionKey } from 'src/lib/keys';
 import TimeTrackerDialogMerge from 'components/time-tracker/TimeTrackerDialogMerge.vue';
 import { useTranslation } from 'i18next-vue';
 import EntryResource from 'src/lib/resources/EntryResource';
+import DayNoteResource from 'src/lib/resources/DayNoteResource';
+import { useDayNoteStore } from 'stores/dayNote';
+import TimeTrackerDayNote from 'components/time-tracker/TimeTrackerDayNote.vue';
 import { showSuccessMessage } from 'src/lib/ui';
 
 const props = defineProps<{
@@ -88,14 +108,20 @@ const emit = defineEmits<{
 }>();
 
 const tempItem = ref<TimeTrackerEntry | null>(null);
+const creatingNote = ref(false);
 
 const timeTrackerStore = useTimeTrackerStore();
+const dayNoteStore = useDayNoteStore();
 const settingsStore = useSettingsStore();
 const { t, } = useTranslation();
 const currentDate = inject<Ref<Date>>(currentDateInjectionKey)!;
 
 const dateIdentifier = computed(() => {
   return date.formatDate(props.day.date, 'YYYY-MM-DD');
+});
+
+const dayNote = computed(() => {
+  return dayNoteStore.notesByDate[dateIdentifier.value] ?? null;
 });
 
 const entries = computed(() => {
@@ -210,6 +236,34 @@ function showMergeDialog(
       .onDismiss(() => resolve(false))
       .onCancel(() => resolve(false));
   });
+}
+
+async function saveNote(text: string) {
+  Loading.show();
+  try {
+    if (dayNote.value) {
+      await DayNoteResource.instance.update(dayNote.value.uid, {
+        text,
+      });
+    }
+    else {
+      await DayNoteResource.instance.store({
+        date: dateIdentifier.value,
+        text,
+      });
+      creatingNote.value = false;
+    }
+  }
+  catch {
+    // TODO add error message
+  }
+  Loading.hide();
+}
+
+async function deleteNote() {
+  if (dayNote.value) {
+    await DayNoteResource.instance.destroy(dayNote.value.uid);
+  }
 }
 
 function createEntry(type: TimeTrackerEntryType) {
