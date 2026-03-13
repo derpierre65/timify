@@ -84,7 +84,7 @@ const editing = ref(!props.note);
 const noteText = ref(props.note?.text ?? '');
 
 function startEdit() {
-  if (props.note) {
+  if (props.note && !editing.value) {
     noteText.value = props.note.text;
     editing.value = true;
   }

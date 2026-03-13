@@ -137,7 +137,7 @@
   },
   "note": {
     "create": "Add Note",
-    "placeholder": "Note..."
+    "placeholder": "Note"
   },
   "tour": {
     "confirm_exit": "Do you really want to cancel the tour? You can restart the tour at any time from the settings.",
