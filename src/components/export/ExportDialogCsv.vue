@@ -12,6 +12,29 @@
           </div>
           <q-toggle v-model="options.ignoreBreaks" :label="$t('export.settings.ignore_breaks')" dense />
 
+          <div class="tw:flex tw:gap-4">
+            <q-input
+              v-model="options.dateFrom"
+              :label="$t('export.settings.date_from')"
+              type="date"
+              class="tw:flex-auto"
+              clearable
+              stack-label
+              dense
+            />
+            <q-input
+              v-model="options.dateTo"
+              :label="$t('export.settings.date_to')"
+              :error="isDateRangeInvalid"
+              :error-message="$t('export.settings.date_range_invalid')"
+              type="date"
+              class="tw:flex-auto"
+              clearable
+              stack-label
+              dense
+            />
+          </div>
+
           <q-input v-model="options.dateFormat" :label="$t('export.settings.date_format')" dense />
         </div>
 
@@ -42,6 +65,7 @@
           :label="$t('export.button')"
           icon="fas fa-download"
           color="primary"
+          :disable="isDateRangeInvalid"
           no-caps
           @click="exportCsv"
         />
@@ -54,7 +78,7 @@
 import { TimeTrackerEntryType, useTimeTrackerStore } from 'stores/timeTracker';
 import { useSettingsStore } from 'stores/settings';
 import { date, useDialogPluginComponent } from 'quasar';
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import { createCsv, downloadCsv } from 'src/lib/csv';
 import { useProjectStore } from 'stores/project';
 import { formatHourAndMinutes } from 'src/lib/date';
@@ -72,12 +96,35 @@ const {
 const options = ref({
   ignoreBreaks: false,
   dateFormat: settingsStore.dateFormat + ' ' + settingsStore.timeFormat,
+  dateFrom: null as string | null,
+  dateTo: null as string | null,
+});
+
+const rangeStart = computed(() => {
+  if (!options.value.dateFrom) {
+    return null;
+  }
+
+  return date.startOfDate(date.extractDate(options.value.dateFrom, 'YYYY-MM-DD'), 'day');
+});
+
+const rangeEnd = computed(() => {
+  if (!options.value.dateTo) {
+    return null;
+  }
+
+  return date.endOfDate(date.extractDate(options.value.dateTo, 'YYYY-MM-DD'), 'day');
+});
+
+const isDateRangeInvalid = computed(() => {
+  return rangeStart.value !== null && rangeEnd.value !== null && rangeStart.value > rangeEnd.value;
 });
 
 const exportFieldDefaultNames = ref({
   uid: t('export.fields.id'),
   project: t('table.project'),
   project_code: t('table.project_code'),
+  weekday: t('export.fields.weekday'),
   start: t('table.start'),
   end: t('table.end'),
   total: t('table.total'),
@@ -87,6 +134,7 @@ const exportFields = ref({
   uid: false,
   project: true,
   project_code: true,
+  weekday: true,
   start: true,
   end: true,
   total: true,
@@ -99,6 +147,10 @@ const exportFieldNames = ref({
 });
 
 async function exportCsv() {
+  if (isDateRangeInvalid.value) {
+    return;
+  }
+
   const activeFields = (Object.keys(exportFields.value) as ExportField[])
     .filter((field) => exportFields.value[field]);
 
@@ -114,6 +166,14 @@ async function exportCsv() {
       continue;
     }
 
+    if (rangeStart.value && entry.start < rangeStart.value) {
+      continue;
+    }
+
+    if (rangeEnd.value && entry.start > rangeEnd.value) {
+      continue;
+    }
+
     let projectName = '';
     if (entry.project) {
       projectName = (await projectStore.find(entry.project)).name;
@@ -123,6 +183,7 @@ async function exportCsv() {
       uid: entry.uid,
       project: projectName,
       project_code: entry.project_code || '',
+      weekday: date.formatDate(entry.start, 'dddd'),
       start: date.formatDate(entry.start, options.value.dateFormat),
       end: date.formatDate(entry.end, options.value.dateFormat),
       total: formatHourAndMinutes((entry.end - entry.start) / 1_000),

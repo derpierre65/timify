@@ -91,12 +91,16 @@
   "export": {
     "button": "Export",
     "fields": {
-      "id": "Internal ID"
+      "id": "Internal ID",
+      "weekday": "Weekday"
     },
     "settings": {
       "title": "Export Settings",
       "ignore_breaks": "Exclude Breaks",
-      "date_format": "Date Format"
+      "date_format": "Date Format",
+      "date_from": "Start Date",
+      "date_to": "End Date",
+      "date_range_invalid": "End date must not be before start date"
     },
     "csv": {
       "fields": "CSV Fields"
