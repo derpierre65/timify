@@ -12,6 +12,10 @@
           </div>
           <q-toggle v-model="options.ignoreBreaks" :label="$t('export.settings.ignore_breaks')" dense />
 
+          <q-toggle v-model="options.weekSeparator" :label="$t('export.settings.week_separator')" dense />
+
+          <q-toggle v-model="options.weekSummary" :label="$t('export.settings.week_summary')" dense />
+
           <div class="tw:flex tw:gap-4">
             <q-input
               v-model="options.dateFrom"
@@ -108,6 +112,8 @@ const options = ref({
   dateFrom: null as string | null,
   dateTo: null as string | null,
   sortOrder: 'asc' as 'asc' | 'desc',
+  weekSeparator: true,
+  weekSummary: true,
 });
 
 const sortOrderOptions = [
@@ -167,6 +173,14 @@ const exportFieldNames = ref({
   ...exportFieldDefaultNames.value,
 });
 
+function getWeekStart(value: Date) {
+  const day = date.startOfDate(value, 'day');
+
+  return date.subtractFromDate(day, {
+    days: (day.getDay() + 6) % 7,
+  });
+}
+
 async function exportCsv() {
   if (isDateRangeInvalid.value) {
     return;
@@ -176,12 +190,38 @@ async function exportCsv() {
     .filter((field) => exportFields.value[field]);
 
   const headers = activeFields.map((field) => exportFieldNames.value[field]);
-  const entries = [];
+  const rows: Array<Array<string | number>> = [];
 
   const sortDirection = options.value.sortOrder === 'asc' ? 1 : -1;
   const sortedEntries = [ ...timeTrackerStore.entries, ].sort((a, b) => {
     return (a.start.getTime() - b.start.getTime()) * sortDirection;
   });
+
+  let currentWeekStart: Date | null = null;
+  let currentWeekWorkSeconds = 0;
+
+  const closeWeek = () => {
+    if (!currentWeekStart || !options.value.weekSummary) {
+      return;
+    }
+
+    const weekEnd = date.endOfDate(date.addToDate(currentWeekStart, {
+      days: 6,
+    }), 'day');
+    const summaryValues: Record<ExportField, string | number> = {
+      uid: '',
+      project: '',
+      project_code: '',
+      weekday: t('week.number', {
+        number: date.getWeekOfYear(currentWeekStart),
+      }),
+      start: date.formatDate(currentWeekStart, settingsStore.dateFormat),
+      end: date.formatDate(weekEnd, settingsStore.dateFormat),
+      total: formatHourAndMinutes(currentWeekWorkSeconds),
+    };
+
+    rows.push(activeFields.map((field) => summaryValues[field]));
+  };
 
   for (const entry of sortedEntries) {
     if (!entry.end) {
@@ -200,6 +240,25 @@ async function exportCsv() {
       continue;
     }
 
+    const weekStart = getWeekStart(entry.start);
+    if (weekStart.getTime() !== currentWeekStart?.getTime()) {
+      if (currentWeekStart) {
+        closeWeek();
+
+        if (options.value.weekSeparator) {
+          rows.push([]);
+        }
+      }
+
+      currentWeekStart = weekStart;
+      currentWeekWorkSeconds = 0;
+    }
+
+    const durationSeconds = (entry.end.getTime() - entry.start.getTime()) / 1_000;
+    if (entry.type === TimeTrackerEntryType.Work) {
+      currentWeekWorkSeconds += durationSeconds;
+    }
+
     let projectName = '';
     if (entry.project) {
       projectName = (await projectStore.find(entry.project)).name;
@@ -212,15 +271,17 @@ async function exportCsv() {
       weekday: date.formatDate(entry.start, 'dddd'),
       start: date.formatDate(entry.start, options.value.dateFormat),
       end: date.formatDate(entry.end, options.value.dateFormat),
-      total: formatHourAndMinutes((entry.end - entry.start) / 1_000),
+      total: formatHourAndMinutes(durationSeconds),
     };
 
-    entries.push(activeFields.map((field) => fieldValues[field]));
+    rows.push(activeFields.map((field) => fieldValues[field]));
   }
+
+  closeWeek();
 
   downloadCsv('timify-timetracker-entries', createCsv([
     headers,
-    ...entries,
+    ...rows,
   ]));
 }
 </script>

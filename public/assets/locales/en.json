@@ -103,7 +103,9 @@
       "date_range_invalid": "End date must not be before start date",
       "sort_order": "Sort by Date",
       "sort_order_asc": "Ascending (oldest first)",
-      "sort_order_desc": "Descending (newest first)"
+      "sort_order_desc": "Descending (newest first)",
+      "week_separator": "Empty line between weeks",
+      "week_summary": "Add weekly summary (total work time)"
     },
     "csv": {
       "fields": "CSV Fields"
