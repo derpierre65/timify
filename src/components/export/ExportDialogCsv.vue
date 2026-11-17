@@ -35,6 +35,15 @@
             />
           </div>
 
+          <q-select
+            v-model="options.sortOrder"
+            :options="sortOrderOptions"
+            :label="$t('export.settings.sort_order')"
+            emit-value
+            map-options
+            dense
+          />
+
           <q-input v-model="options.dateFormat" :label="$t('export.settings.date_format')" dense />
         </div>
 
@@ -98,7 +107,19 @@ const options = ref({
   dateFormat: settingsStore.dateFormat + ' ' + settingsStore.timeFormat,
   dateFrom: null as string | null,
   dateTo: null as string | null,
+  sortOrder: 'asc' as 'asc' | 'desc',
 });
+
+const sortOrderOptions = [
+  {
+    label: t('export.settings.sort_order_asc'),
+    value: 'asc',
+  },
+  {
+    label: t('export.settings.sort_order_desc'),
+    value: 'desc',
+  },
+];
 
 const rangeStart = computed(() => {
   if (!options.value.dateFrom) {
@@ -157,7 +178,12 @@ async function exportCsv() {
   const headers = activeFields.map((field) => exportFieldNames.value[field]);
   const entries = [];
 
-  for (const entry of timeTrackerStore.entries) {
+  const sortDirection = options.value.sortOrder === 'asc' ? 1 : -1;
+  const sortedEntries = [ ...timeTrackerStore.entries, ].sort((a, b) => {
+    return (a.start.getTime() - b.start.getTime()) * sortDirection;
+  });
+
+  for (const entry of sortedEntries) {
     if (!entry.end) {
       continue;
     }

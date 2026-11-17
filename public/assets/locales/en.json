@@ -100,7 +100,10 @@
       "date_format": "Date Format",
       "date_from": "Start Date",
       "date_to": "End Date",
-      "date_range_invalid": "End date must not be before start date"
+      "date_range_invalid": "End date must not be before start date",
+      "sort_order": "Sort by Date",
+      "sort_order_asc": "Ascending (oldest first)",
+      "sort_order_desc": "Descending (newest first)"
     },
     "csv": {
       "fields": "CSV Fields"
