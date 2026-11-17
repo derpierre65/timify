@@ -10,11 +10,18 @@
           <div>
             <strong>{{ $t('export.settings.title') }}</strong>
           </div>
-          <q-toggle v-model="options.ignoreBreaks" :label="$t('export.settings.ignore_breaks')" dense />
 
-          <q-toggle v-model="options.weekSeparator" :label="$t('export.settings.week_separator')" dense />
+          <div>
+            <q-toggle v-model="options.ignoreBreaks" :label="$t('export.settings.ignore_breaks')" dense />
+          </div>
 
-          <q-toggle v-model="options.weekSummary" :label="$t('export.settings.week_summary')" dense />
+          <div>
+            <q-toggle v-model="options.weekSeparator" :label="$t('export.settings.week_separator')" dense/>
+          </div>
+
+          <div>
+            <q-toggle v-model="options.weekSummary" :label="$t('export.settings.week_summary')" dense/>
+          </div>
 
           <div class="tw:flex tw:gap-4">
             <q-input
