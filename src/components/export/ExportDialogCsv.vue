@@ -118,7 +118,7 @@ const options = ref({
   dateFormat: settingsStore.dateFormat + ' ' + settingsStore.timeFormat,
   dateFrom: null as string | null,
   dateTo: null as string | null,
-  sortOrder: 'asc' as 'asc' | 'desc',
+  sortOrder: 'desc' as 'asc' | 'desc',
   weekSeparator: true,
   weekSummary: true,
 });
