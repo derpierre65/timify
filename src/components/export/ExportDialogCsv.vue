@@ -253,7 +253,7 @@ async function exportCsv() {
         closeWeek();
 
         if (options.value.weekSeparator) {
-          rows.push([]);
+          rows.push(activeFields.map(() => ''));
         }
       }
 
